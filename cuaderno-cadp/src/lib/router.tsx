@@ -3,8 +3,19 @@ import { createContext, useCallback, useContext, useEffect, useState, type Ancho
 /**
  * Router mínimo basado en la History API. La app tiene pocas rutas y así
  * evitamos una dependencia externa. Vercel reescribe todas las rutas a
- * index.html (ver vercel.json), por lo que los links se pueden compartir.
+ * index.html (ver vercel.json) y en GitHub Pages se usa una copia como 404.html,
+ * por lo que los links se pueden compartir.
+ *
+ * BASE es la subcarpeta donde vive el sitio: "" en Vercel o en local, y
+ * "/AppCADPInteractiva" en GitHub Pages (se configura con BASE_PATH al compilar).
  */
+const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const actual = () => {
+  const p = window.location.pathname;
+  const sinBase = p.startsWith(BASE) ? p.slice(BASE.length) : p;
+  return sinBase || "/";
+};
+export const href = (to: string) => BASE + to;
 interface RouterValue {
   path: string;
   navigate: (to: string) => void;
@@ -12,17 +23,17 @@ interface RouterValue {
 const RouterCtx = createContext<RouterValue>({ path: "/", navigate: () => {} });
 
 export function RouterProvider({ children }: { children: ReactNode }) {
-  const [path, setPath] = useState(() => window.location.pathname);
+  const [path, setPath] = useState(actual);
 
   useEffect(() => {
-    const onPop = () => setPath(window.location.pathname);
+    const onPop = () => setPath(actual());
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
   const navigate = useCallback((to: string) => {
-    if (to === window.location.pathname) return;
-    window.history.pushState(null, "", to);
+    if (to === actual()) return;
+    window.history.pushState(null, "", href(to));
     setPath(to);
     window.scrollTo(0, 0);
   }, []);
@@ -48,5 +59,5 @@ export function Link({ to, onClick, ...rest }: LinkProps) {
     e.preventDefault();
     navigate(to);
   };
-  return <a href={to} onClick={handle} {...rest} />;
+  return <a href={href(to)} onClick={handle} {...rest} />;
 }

@@ -17,6 +17,7 @@ begin
 end.`;
 
 const SIMS = [
+  { to: "/compilador", t: "Compilador Pascal", d: "Escribí y ejecutá tus programas, con entrada por consola y errores en español." },
   { to: "/vectores/simulador", t: "Vectores", d: "Insertar, eliminar y buscar con corrimientos paso a paso." },
   { to: "/punteros/simulador", t: "Punteros", d: "new, dispose, nil y los errores clásicos de memoria." },
   { to: "/listas/simulador", t: "Listas", d: "Agregar adelante y atrás, insertar ordenado y eliminar." },
@@ -51,7 +52,8 @@ export function Home() {
             ) : (
               <Link className="btn pri lg" to="/control">Empezar por la Práctica 1</Link>
             )}
-            <Link className="btn lg" to="/mezcla">Quiz mezclado</Link>
+            <Link className="btn lg" to="/compilador">Abrir el compilador</Link>
+            <Link className="btn lg ghost" to="/mezcla">Quiz mezclado</Link>
           </div>
           <dl className="kpis">
             <div><dt>Prácticas</dt><dd>{TEMAS.length}</dd></div>
@@ -60,7 +62,7 @@ export function Home() {
           </dl>
         </div>
         <div className="hh-code">
-          <CodeBlock code={MUESTRA} title="CUADERNO.PAS" numbers copy={false} active={7} />
+          <CodeBlock code={MUESTRA} title="CUADERNO.PAS" numbers copy={false} probar={false} active={7} />
         </div>
       </section>
 
@@ -84,13 +86,13 @@ export function Home() {
         })}
       </div>
 
-      <h2 className="section-h">Simuladores</h2>
+      <h2 className="section-h">Herramientas</h2>
       <div className="grid sims">
         {SIMS.map((s) => (
           <Link key={s.to} to={s.to} className="card sim-card">
             <h3>{s.t}</h3>
             <p>{s.d}</p>
-            <span className="go">Abrir simulador →</span>
+            <span className="go">{s.to === "/compilador" ? "Abrir compilador →" : "Abrir simulador →"}</span>
           </Link>
         ))}
       </div>

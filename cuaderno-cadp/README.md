@@ -6,6 +6,7 @@ Página de estudio para **Conceptos de Algoritmos, Datos y Programas** (Facultad
 - 55 preguntas de autoevaluación con explicación, más un quiz mezclado.
 - Ejercicios de las prácticas con pista y solución en Pascal.
 - Simuladores paso a paso de vectores, punteros, listas y pruebas de escritorio.
+- Un compilador de Pascal en el navegador (`/compilador`), con entrada interactiva por consola y errores en español.
 
 El progreso de cada persona se guarda en su propio navegador (`localStorage`). No hace falta crear cuentas ni tener un servidor.
 
@@ -49,6 +50,20 @@ Cada vez que hagas `git push` a `main`, Vercel publica la nueva versión automá
 
 El archivo `vercel.json` hace que los links directos (por ejemplo `/listas/simulador`) funcionen al compartirlos o recargar la página.
 
+## Publicarlo en GitHub Pages
+
+El repositorio ya incluye el workflow `.github/workflows/deploy.yml` (en la raíz del repo, una carpeta arriba de este proyecto). Compila el proyecto y lo publica en GitHub Pages en cada `git push` a `main`.
+
+1. En GitHub, entrá al repositorio → **Settings** → **Pages**.
+2. En **Build and deployment → Source**, elegí **GitHub Actions**.
+3. Hacé `git push`. En la pestaña **Actions** vas a ver el workflow "Publicar en GitHub Pages" corriendo. Tarda un par de minutos.
+4. Cuando termina, el sitio queda en `https://USUARIO.github.io/NOMBRE-DEL-REPO/`.
+
+Detalles técnicos:
+
+- GitHub Pages sirve el sitio en una subcarpeta. El workflow define `BASE_PATH=/NOMBRE-DEL-REPO/` al compilar y Vite y el router la usan para armar los links. En local y en Vercel no hace falta: queda en `/`.
+- GitHub Pages no sabe de rutas como `/listas/simulador`. Por eso el workflow copia `index.html` como `404.html`: cuando alguien abre un link directo, GitHub devuelve esa página y la app muestra la sección correcta.
+
 ## Estructura
 
 ```
@@ -59,6 +74,7 @@ src/
   components/          Layout, bloque de código, quiz, ejercicios, reproductor
   sims/                Simuladores: lógica pura (*Ops.ts, *Model.ts, traces.ts) y vistas (*.tsx)
   pages/               Inicio, página de tema y quiz mezclado
+  pascal/              Intérprete de Pascal: lexer, parser con chequeo de tipos, intérprete y Web Worker
   lib/                 Router mínimo, progreso, tema claro/oscuro, resaltado de Pascal
   styles/global.css    Estilos y colores (claro y oscuro)
 ```
@@ -88,9 +104,21 @@ TypeScript te avisa si falta algún campo. Los textos de teoría y de las pregun
 | --- | --- |
 | `/` | Inicio |
 | `/mezcla` | Quiz mezclado |
+| `/compilador` | Compilador Pascal |
 | `/:tema` | Teoría del tema (por ejemplo `/vectores`) |
 | `/:tema/quiz` | Quiz del tema |
 | `/:tema/ejercicios` | Ejercicios del tema |
 | `/:tema/simulador` | Simulador (en los temas que lo tienen) |
 
 Temas: `control`, `modulos`, `parametros`, `registros`, `vectores`, `punteros`, `listas`, `repaso`.
+
+## El compilador
+
+No es Free Pascal: es un intérprete escrito en TypeScript (`src/pascal/`) que cubre lo que se usa en CADP y corre en un Web Worker, así la página no se congela.
+
+- `lexer.ts` separa el código en tokens.
+- `parser.ts` lo analiza en una sola pasada y chequea tipos, como los compiladores Pascal clásicos. Acá están los mensajes de error de compilación.
+- `interp.ts` ejecuta el árbol. Cuando un `read` necesita un dato que todavía no se ingresó, corta la ejecución; la página pide el dato y vuelve a correr el programa desde el principio con todas las líneas ingresadas. Como los programas son deterministas, el resultado es el mismo que si hubiera esperado.
+- `usePascalRunner.ts` maneja el worker desde React (ejecutar, ingresar datos, detener).
+
+Para comparar con Free Pascal real: las soluciones completas del cuaderno dan exactamente la misma salida en los dos.

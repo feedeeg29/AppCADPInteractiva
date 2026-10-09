@@ -3,6 +3,7 @@ import { Layout } from "./components/Layout";
 import { temaPorId } from "./data/temas";
 import { Link, useSegments } from "./lib/router";
 import { Home } from "./pages/Home";
+import { CompilerPage } from "./pages/CompilerPage";
 import { MixedQuiz } from "./pages/MixedQuiz";
 import { SECCIONES, TopicPage, type Seccion } from "./pages/TopicPage";
 
@@ -22,6 +23,7 @@ function Rutas() {
   const [a, b, ...resto] = useSegments();
   if (!a) return <Home />;
   if (a === "mezcla" && !b) return <MixedQuiz />;
+  if (a === "compilador" && !b) return <CompilerPage />;
   const tema = temaPorId(a);
   if (!tema || resto.length) return <NotFound />;
   const seccion = (b ?? "teoria") as Seccion;

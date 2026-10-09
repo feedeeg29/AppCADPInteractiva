@@ -84,8 +84,11 @@ function Sidebar({ abierto, actual }: { abierto: boolean; actual?: string }) {
           </Link>
         );
       })}
-      <div className="lbl">Repaso</div>
-      <Link to="/mezcla" className={"nav" + (actual === "mezcla" ? " cur" : "")}>
+      <div className="lbl">Herramientas</div>
+      <Link to="/compilador" className={"nav" + (actual === "compilador" ? " cur" : "")} aria-current={actual === "compilador" ? "page" : undefined}>
+        <span className="n">▶</span><span className="t">Compilador</span>
+      </Link>
+      <Link to="/mezcla" className={"nav" + (actual === "mezcla" ? " cur" : "")} aria-current={actual === "mezcla" ? "page" : undefined}>
         <span className="n">?</span><span className="t">Quiz mezclado</span>
       </Link>
     </nav>

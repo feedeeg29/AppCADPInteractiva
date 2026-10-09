@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { highlightLines } from "../lib/pascal";
+import { useRouter } from "../lib/router";
+
+const CODE_KEY = "cadp-compilador-codigo";
 
 interface Props {
   code: string;
@@ -8,9 +11,13 @@ interface Props {
   /** Línea resaltada (1-based). 0 = ninguna */
   active?: number;
   copy?: boolean;
+  /** Mostrar "Probar" si el código es un programa completo */
+  probar?: boolean;
 }
 
-export function CodeBlock({ code, title = "pascal", numbers = false, active = 0, copy = true }: Props) {
+export function CodeBlock({ code, title = "pascal", numbers = false, active = 0, copy = true, probar = true }: Props) {
+  const { navigate } = useRouter();
+  const esPrograma = probar && /^\s*program\b/i.test(code);
   const lines = useMemo(() => highlightLines(code), [code]);
   const preRef = useRef<HTMLPreElement>(null);
   const [copiado, setCopiado] = useState(false);
@@ -46,6 +53,12 @@ export function CodeBlock({ code, title = "pascal", numbers = false, active = 0,
       <div className="ide-bar">
         <span className="ide-dots" aria-hidden="true" />
         <b>{title}</b>
+        {esPrograma && (
+          <button type="button" className="run" onClick={() => {
+            try { localStorage.setItem(CODE_KEY, code); } catch { /* ignorar */ }
+            navigate("/compilador");
+          }}>▶ Probar</button>
+        )}
         {copy && (
           <button type="button" onClick={onCopy}>
             {copiado ? "Copiado ✓" : "Copiar"}

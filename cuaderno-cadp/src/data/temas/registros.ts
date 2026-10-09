@@ -43,12 +43,15 @@ end.`
     {
       code: `procedure leerAlumno(var alu : alumno);
 begin
-  read(alu.codigo);
+  readln(alu.codigo);
   if (alu.codigo <> 0) then begin
-    read(alu.nombre);
-    read(alu.promedio);
+    readln(alu.nombre);
+    readln(alu.promedio);
   end;
 end;`
+    },
+    {
+      tip: "Cuando un registro tiene campos string, leé cada campo con <code>readln</code>. Un <code>read</code> de un número deja pendiente el fin de la línea, y el siguiente read de un string lee esa línea vacía."
     },
     { h: "Corte de control" },
     {
@@ -138,10 +141,10 @@ type
   end;
 procedure leer(var alu : alumno);
 begin
-  read(alu.codigo);
+  readln(alu.codigo);
   if (alu.codigo <> 0) then begin
     readln(alu.nombre);
-    read(alu.promedio);
+    readln(alu.promedio);
   end;
 end;
 var
