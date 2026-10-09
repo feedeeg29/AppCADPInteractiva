@@ -1,0 +1,2984 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light}body{margin:0}[hidden]{display:none!important}</style></head><body>
+<title>Cuaderno CADP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: barra superior + índice de prácticas a la izquierda (chips arriba en el teléfono) + área de estudio con pestañas.
+   La única nota fuerte: el código se ve como el IDE azul de Turbo Pascal. */
+:root{
+  --bg:#F3F5FA; --surface:#FFFFFF; --sunk:#E9EDF5; --ink:#141A2E; --muted:#58617C; --line:#D8DEEA;
+  --accent:#2340B8; --accent-ink:#FFFFFF; --accent-soft:#E3E8FB; --hi:#F5C518;
+  --ok:#1C7F4E; --ok-soft:#DDF2E6; --bad:#B8402B; --bad-soft:#F9E1DC; --warn:#9A6400; --warn-soft:#FBEFD3;
+  --ide-bg:#0B1F9E; --ide-ink:#E8ECFF; --ide-kw:#FFE15A; --ide-str:#7DF0C5; --ide-num:#FFB38A; --ide-com:#9FB0F2; --ide-line:#2A3FB8; --ide-hl:#1C34C9;
+  --f-display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-code:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0D1120; --surface:#151B2F; --sunk:#1B2238; --ink:#E7EAF4; --muted:#9BA4BF; --line:#283152;
+  --accent:#93A8FF; --accent-ink:#0D1120; --accent-soft:#1F2A55; --hi:#F5C518;
+  --ok:#5CCB92; --ok-soft:#163626; --bad:#FF8B76; --bad-soft:#3A1B17; --warn:#F2C25B; --warn-soft:#3A2D12;
+  --ide-bg:#0A1872; --ide-line:#22339A; --ide-hl:#1A2DB0;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0D1120; --surface:#151B2F; --sunk:#1B2238; --ink:#E7EAF4; --muted:#9BA4BF; --line:#283152;
+  --accent:#93A8FF; --accent-ink:#0D1120; --accent-soft:#1F2A55; --hi:#F5C518;
+  --ok:#5CCB92; --ok-soft:#163626; --bad:#FF8B76; --bad-soft:#3A1B17; --warn:#F2C25B; --warn-soft:#3A2D12;
+  --ide-bg:#0A1872; --ide-line:#22339A; --ide-hl:#1A2DB0;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--hi);outline-offset:2px;border-radius:4px}
+code{font-family:var(--f-code);font-size:.86em;background:var(--sunk);padding:.08em .35em;border-radius:4px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{max-width:1240px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:10px;text-decoration:none;color:var(--ink);cursor:pointer;background:none;border:0;padding:0}
+.brand b{font-family:var(--f-display);font-weight:800;font-size:22px;letter-spacing:-.01em}
+.brand span{font-size:13px;color:var(--muted)}
+.cursor{display:inline-block;width:.55em;height:1em;background:var(--hi);vertical-align:-2px;margin-left:2px;animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.gbar{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)}
+.meter{width:140px;height:8px;background:var(--sunk);border-radius:99px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .4s}
+.sync{font-size:12px;color:var(--muted)}
+
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:20px 60px;display:grid;grid-template-columns:250px minmax(0,1fr);gap:28px}
+.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 70px);align-self:start;display:flex;flex-direction:column;gap:4px}
+.side .lbl{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:4px 10px 6px}
+.nav{display:grid;grid-template-columns:44px 1fr;align-items:center;gap:2px 8px;text-align:left;background:none;border:1px solid transparent;border-radius:var(--r);padding:8px 10px;cursor:pointer}
+.nav:hover{background:var(--surface);border-color:var(--line)}
+.nav[aria-current="true"]{background:var(--surface);border-color:var(--accent)}
+.nav .n{grid-row:span 2;font-family:var(--f-code);font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:6px;text-align:center;padding:4px 0}
+.nav .t{font-weight:600;font-size:15px;line-height:1.2}
+.nav .p{height:4px;background:var(--sunk);border-radius:99px;overflow:hidden}
+.nav .p i{display:block;height:100%;background:var(--ok)}
+
+main{min-width:0}
+.hero{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.eyebrow{font-family:var(--f-code);font-size:13px;color:var(--muted)}
+.hero h1{font-size:clamp(30px,4.2vw,44px);font-weight:800;letter-spacing:-.02em}
+.hero p{margin:0;max-width:64ch;color:var(--muted)}
+
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:22px;overflow-x:auto;scrollbar-width:none}
+.tab{background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;display:flex;gap:8px;align-items:center}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab .badge{font-size:12px;font-weight:600;background:var(--sunk);color:var(--muted);padding:1px 8px;border-radius:99px}
+.tab .badge.done{background:var(--ok-soft);color:var(--ok)}
+
+/* teoría */
+.prose{max-width:74ch;display:flex;flex-direction:column;gap:14px}
+.prose h2{font-size:24px;font-weight:700;margin-top:14px}
+.prose p{margin:0}
+.prose ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+.tip{background:var(--warn-soft);border-left:4px solid var(--hi);padding:12px 16px;border-radius:0 var(--r) var(--r) 0}
+.tip::before{content:"Ojo";display:block;font-family:var(--f-code);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--warn);margin-bottom:2px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.tbl table{border-collapse:collapse;width:100%;font-size:15px}
+.tbl th,.tbl td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}
+.tbl th{background:var(--sunk);font-weight:700}
+
+/* bloque de código estilo IDE */
+.ide{background:var(--ide-bg);color:var(--ide-ink);border-radius:var(--r);overflow:hidden;font-family:var(--f-code);font-size:14px;line-height:1.6;position:relative;min-width:0}
+.ide .bar{display:flex;align-items:center;gap:8px;background:var(--ide-line);padding:4px 10px;font-size:12px;color:var(--ide-com)}
+.ide .bar b{color:var(--ide-ink);font-weight:600}
+.ide .bar button{margin-left:auto;background:none;border:1px solid var(--ide-com);color:var(--ide-ink);border-radius:5px;font-size:12px;padding:1px 8px;cursor:pointer;font-family:var(--f-code)}
+.ide pre{margin:0;padding:12px 0;overflow-x:auto}
+.ide .ln{display:block;padding:0 14px;white-space:pre;min-height:1.6em}
+.ide .ln.cur{background:var(--ide-hl);box-shadow:inset 3px 0 0 var(--hi)}
+.ide .ln[data-n]::before{content:attr(data-n);display:inline-block;width:2.2em;color:var(--ide-com);opacity:.7;user-select:none}
+.k{color:var(--ide-kw);font-weight:600}.s{color:var(--ide-str)}.nu{color:var(--ide-num)}.c{color:var(--ide-com);font-style:italic}
+
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 14px;font-weight:600;cursor:pointer;font-size:15px}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* quiz */
+.qlist{display:flex;flex-direction:column;gap:16px;max-width:78ch}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.q .qh{display:flex;gap:10px;align-items:baseline}
+.q .qn{font-family:var(--f-code);font-size:13px;color:var(--muted);flex:none}
+.q .qt{font-weight:600}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 12px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt .l{font-family:var(--f-code);font-size:13px;font-weight:600;color:var(--muted);flex:none;padding-top:2px}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.exp{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--sunk)}
+.exp b{color:var(--ok)}.exp.no b{color:var(--bad)}
+.score{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.score .big{font-family:var(--f-display);font-size:36px;font-weight:800;font-variant-numeric:tabular-nums}
+
+/* ejercicios */
+.elist{display:flex;flex-direction:column;gap:14px;max-width:82ch}
+.ex{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.ex.done{border-color:var(--ok)}
+.ex .eh{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ref{font-family:var(--f-code);font-size:12px;font-weight:600;background:var(--accent-soft);color:var(--accent);padding:2px 8px;border-radius:5px}
+.ex h3{font-size:19px;font-weight:700}
+.ex p{margin:0}
+.chk{margin-left:auto;display:flex;gap:6px;align-items:center;font-size:14px;color:var(--muted);cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--ok)}
+details{border-top:1px dashed var(--line);padding-top:8px}
+summary{cursor:pointer;font-weight:600;color:var(--accent);padding:2px 0}
+details[open] summary{margin-bottom:8px}
+.pista{background:var(--warn-soft);padding:10px 12px;border-radius:8px}
+
+/* inicio */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px;text-align:left;cursor:pointer}
+.card:hover{border-color:var(--accent)}
+.card .ch{display:flex;justify-content:space-between;align-items:center}
+.card h3{font-size:20px;font-weight:700}
+.card p{margin:0;font-size:15px;color:var(--muted);flex:1}
+.stats{display:flex;gap:12px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;flex-wrap:wrap}
+.stats span b{color:var(--ink)}
+.pill{font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--sunk);color:var(--muted)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.mid{background:var(--warn-soft);color:var(--warn)}
+.section-h{font-size:22px;font-weight:700;margin:26px 0 12px}
+.intro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:18px;margin-bottom:8px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.panel h3{font-size:18px;margin-bottom:8px}
+.panel ol,.panel ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+
+/* simuladores */
+.sim{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;align-items:start}
+.stage{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.stage h3{font-size:17px}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:end}
+.field{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}
+.field input,.field select{width:92px;padding:6px 8px;border:1px solid var(--line);border-radius:7px;background:var(--bg);font-size:15px}
+.field.wide input{width:200px}
+.msg{font-size:15px;padding:10px 12px;border-radius:8px;background:var(--sunk);min-height:2.6em}
+.msg.err{background:var(--bad-soft);color:var(--bad)}
+.msg.okm{background:var(--ok-soft);color:var(--ok)}
+.player{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.player .pos{font-family:var(--f-code);font-size:13px;color:var(--muted);margin-left:4px;font-variant-numeric:tabular-nums}
+.simpick{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.simpick .btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+.vec{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px;padding:22px 2px 30px;position:relative}
+.cell{min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative}
+.cell .box{width:100%;aspect-ratio:1;max-width:100%;display:grid;place-items:center;border:2px solid var(--line);border-radius:8px;background:var(--bg);font-family:var(--f-code);font-weight:600;font-size:clamp(12px,1.4vw,16px);transition:background .2s,border-color .2s,transform .2s}
+.cell .idx{font-family:var(--f-code);font-size:12px;color:var(--muted)}
+.cell.used .box{background:var(--accent-soft);border-color:var(--accent)}
+.cell.stale .box{color:var(--muted);border-style:dashed;opacity:.6}
+.cell.cmp .box{background:var(--warn-soft);border-color:var(--hi);transform:translateY(-4px)}
+.cell.mov .box{background:var(--hi);color:#141A2E;border-color:var(--hi)}
+.cell.new .box{background:var(--ok-soft);border-color:var(--ok)}
+.cell.found .box{background:var(--ok);color:var(--surface);border-color:var(--ok)}
+.cell .tag{position:absolute;bottom:-24px;font-family:var(--f-code);font-size:11px;font-weight:600;color:var(--accent);white-space:nowrap}
+.cell .tagt{position:absolute;top:-20px;font-family:var(--f-code);font-size:11px;font-weight:600;color:var(--bad);white-space:nowrap}
+
+.mem{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:12px}
+.mem .col{border:1px solid var(--line);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:8px;background:var(--bg);min-width:0}
+.mem .col h4{margin:0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between}
+.var{display:flex;align-items:center;gap:8px;font-family:var(--f-code);font-size:14px;flex-wrap:wrap}
+.var .nm{font-weight:600;min-width:1.4em}
+.addr{padding:3px 8px;border-radius:6px;border:1px solid var(--line);background:var(--surface);font-weight:600}
+.blk{display:flex;align-items:center;gap:8px;font-family:var(--f-code);font-size:14px;padding:6px 8px;border-radius:7px;border:1px solid var(--line);background:var(--surface);flex-wrap:wrap}
+.blk .a{font-weight:600}
+.blk .v{margin-left:auto;font-weight:600}
+.blk.freed{opacity:.5;border-style:dashed}
+.blk.lost{border-color:var(--bad);background:var(--bad-soft)}
+.c0{--c:#2F6BFF}.c1{--c:#E5484D}.c2{--c:#12A37A}.c3{--c:#C47A00}.c4{--c:#8E4EC6}.c5{--c:#0E8FA8}
+.addr.cx,.blk.cx .a{color:var(--c);border-color:var(--c)}
+.empty{font-size:14px;color:var(--muted);font-style:italic}
+
+.lst{display:flex;align-items:center;gap:0;overflow-x:auto;padding:26px 4px 30px;min-height:120px}
+.ptr{flex:none;font-family:var(--f-code);font-size:13px;font-weight:700;color:var(--accent);margin-right:6px}
+.node{flex:none;display:flex;border:2px solid var(--line);border-radius:8px;background:var(--bg);font-family:var(--f-code);position:relative;transition:border-color .2s,background .2s}
+.node .d{padding:8px 8px;font-weight:600;font-size:15px;min-width:36px;text-align:center}
+.node .sg{padding:8px 5px;border-left:2px solid var(--line);color:var(--muted);font-size:12px;display:grid;place-items:center}
+.node.hl{border-color:var(--hi);background:var(--warn-soft)}
+.node.nw{border-color:var(--ok);background:var(--ok-soft)}
+.node.del{border-color:var(--bad);background:var(--bad-soft)}
+.node .lb{position:absolute;top:-22px;left:0;right:0;text-align:center;font-family:var(--f-code);font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap}
+.node .lb2{position:absolute;bottom:-22px;left:0;right:0;text-align:center;font-family:var(--f-code);font-size:11px;font-weight:700;color:var(--bad);white-space:nowrap}
+.arrow{flex:none;width:18px;height:2px;background:var(--muted);position:relative;margin:0 2px}
+.arrow::after{content:"";position:absolute;right:-1px;top:-4px;border:5px solid transparent;border-left:7px solid var(--muted);border-right:0}
+.nil{flex:none;font-family:var(--f-code);font-size:13px;color:var(--muted);border:1px dashed var(--line);border-radius:6px;padding:6px 8px}
+.nuebox{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--muted);min-height:48px}
+
+.trace-in{display:flex;gap:4px;flex-wrap:wrap;font-family:var(--f-code);font-size:14px}
+.trace-in span{padding:3px 8px;border-radius:6px;background:var(--sunk);border:1px solid var(--line)}
+.trace-in span.cur{background:var(--hi);color:#141A2E;border-color:var(--hi)}
+.trace-in span.done{opacity:.45}
+.frames{display:flex;flex-direction:column;gap:10px}
+.frame{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.frame h4{margin:0;padding:5px 10px;background:var(--sunk);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.frame table{border-collapse:collapse;width:100%;font-family:var(--f-code);font-size:14px}
+.frame td{padding:5px 10px;border-top:1px solid var(--line)}
+.frame td:first-child{font-weight:600;width:40%}
+.frame td.chg{background:var(--warn-soft);color:var(--warn);font-weight:700}
+.out{font-family:var(--f-code);font-size:14px;background:var(--sunk);border-radius:8px;padding:8px 10px;white-space:pre-wrap;min-height:2.4em}
+.out::before{content:"Salida";display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-family:var(--f-body);margin-bottom:2px}
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:15px;z-index:50}
+
+@media (max-width:900px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:16px}
+  .side{position:static;flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:4px;scrollbar-width:thin}
+  .side .lbl{display:none}
+  .nav{flex:none;grid-template-columns:auto auto;padding:6px 10px;background:var(--surface);border-color:var(--line)}
+  .nav .n{grid-row:auto;padding:3px 6px}
+  .nav .p{display:none}
+  .nav .t{font-size:14px;white-space:nowrap}
+  .sim,.intro{grid-template-columns:minmax(0,1fr)}
+  .meter{width:80px}
+}
+@media (max-width:520px){
+  body{font-size:16px}
+  .mem{grid-template-columns:minmax(0,1fr)}
+  .brand span{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <button class="brand" id="home-link" type="button" aria-label="Ir al inicio"><b>Cuaderno CADP<span class="cursor" aria-hidden="true"></span></b><span>Conceptos de Algoritmos, Datos y Programas · UNLP 2026</span></button>
+    <div class="gbar"><span id="gtext">0% completado</span><div class="meter" aria-hidden="true"><i id="gmeter" style="width:0%"></i></div><span class="sync" id="sync"></span></div>
+  </div>
+</header>
+<div class="wrap">
+  <nav class="side" id="side" aria-label="Prácticas"></nav>
+  <main id="main"></main>
+</div>
+<div class="toast" id="toast" hidden></div>
+<script>
+/* ====== CONTENIDO: temas 1 a 4 ====== */
+const TEMAS = [];
+
+TEMAS.push({
+  id: "control", num: "P1", titulo: "Estructuras de control",
+  fuente: "Práctica 1 (partes 1, 2 y adicionales)",
+  resumen: "If, case, while, repeat-until y for. Los patrones que se repiten en todo el resto de la materia: contadores, acumuladores, máximos y mínimos.",
+  sim: "traza",
+  teoria: [
+    { h: "Esqueleto de un programa" },
+    { p: "Todo programa Pascal tiene el mismo orden: encabezado, constantes, tipos, módulos, variables del programa principal y el cuerpo entre <code>begin</code> y <code>end.</code> (con punto)." },
+    { code: `program ejemplo;
+const
+  FIN = -1;
+type
+  str20 = string[20];
+var
+  num, cant : integer;
+begin
+  cant := 0;
+  read(num);
+  while (num <> FIN) do begin
+    cant := cant + 1;
+    read(num);
+  end;
+  writeln('Leí ', cant, ' números');
+end.` },
+    { h: "Operadores que más se usan" },
+    { list: [
+      "<code>div</code> división entera (17 div 5 = 3) y <code>mod</code> resto (17 mod 5 = 2). Solo para enteros.",
+      "<code>/</code> siempre da un <code>real</code>, aunque divida dos enteros.",
+      "<code>and</code>, <code>or</code> y <code>not</code> tienen <b>más prioridad</b> que <code>&lt;</code>, <code>=</code>, <code>&gt;</code>. Por eso cada comparación va entre paréntesis: <code>(x &gt; 5) and (x &lt; 10)</code>.",
+      "Para descomponer un número en dígitos: <code>dig := num mod 10</code> te da el último y <code>num := num div 10</code> lo saca."
+    ] },
+    { h: "Selección: if y case" },
+    { p: "Antes de un <code>else</code> nunca va punto y coma: el <code>;</code> cierra la sentencia if y el <code>else</code> queda huérfano." },
+    { code: `if (a > b) then
+  writeln('El mayor es ', a)
+else if (b > a) then
+  writeln('El mayor es ', b)
+else
+  writeln('Los números leídos son iguales');
+
+case opcion of
+  1: writeln('drama');
+  2, 3: writeln('romántico o acción');
+else
+  writeln('otro');
+end;` },
+    { h: "Las tres repeticiones" },
+    { table: [
+      ["Estructura", "Se ejecuta", "Cuándo usarla"],
+      ["<code>for</code>", "Una cantidad conocida de veces", "\"Leer 200 productos\", \"recorrer el vector de 1 a dimL\""],
+      ["<code>while</code>", "0 o más veces (evalúa antes)", "Fin por un valor que <b>no</b> se procesa"],
+      ["<code>repeat … until</code>", "1 o más veces (evalúa después)", "Fin por un valor que <b>sí</b> se procesa"]
+    ] },
+    { tip: "La variable de control del <code>for</code> no se modifica dentro del bucle y su valor al terminar no está definido. Si necesitás cortar antes, el problema pide un <code>while</code>." },
+    { h: "Lectura con valor de corte" },
+    { p: "Esta distinción aparece en casi todos los enunciados. Fijate siempre si el último dato \"debe procesarse\" o no." },
+    { code: `{ El valor de corte NO se procesa: lectura previa + while }
+read(num);
+while (num <> 0) do begin
+  procesar(num);
+  read(num);
+end;
+
+{ El valor de corte SÍ se procesa: repeat }
+repeat
+  read(num);
+  procesar(num);
+until (num = 0);` },
+    { h: "Patrones: contador, acumulador, máximo" },
+    { code: `cant := 0;  suma := 0;  max := -32768;
+for i := 1 to 10 do begin
+  read(num);
+  cant := cant + 1;          { contador }
+  suma := suma + num;        { acumulador }
+  if (num > max) then begin  { máximo }
+    max := num;
+    posMax := i;
+  end;
+end;` },
+    { p: "Para los <b>dos mínimos</b> (o dos máximos) el orden importa: si el nuevo valor supera al primero, el primero baja a segundo lugar." },
+    { code: `min1 := 32767;  min2 := 32767;
+...
+if (num < min1) then begin
+  min2 := min1;
+  min1 := num;
+end
+else if (num < min2) then
+  min2 := num;` }
+  ],
+  quiz: [
+    { q: "¿Cuántas veces como mínimo se ejecuta el cuerpo de un <code>repeat … until</code>?", ops: ["0", "1", "Depende de la condición", "2"], ok: 1, exp: "La condición se evalúa al final, así que el cuerpo siempre corre al menos una vez." },
+    { q: "El enunciado dice: \"La lectura finaliza al ingresar el legajo -1, que no debe procesarse\". ¿Qué estructura conviene?", ops: ["for", "repeat-until", "Lectura previa + while", "case"], ok: 2, exp: "Leés antes de entrar; si es -1 el while ni arranca. Dentro del bucle procesás y volvés a leer al final." },
+    { q: "¿Cuánto valen <code>17 div 5</code> y <code>17 mod 5</code>?", ops: ["3 y 2", "3,4 y 2", "2 y 3", "3 y 0"], ok: 0, exp: "div es el cociente entero (3) y mod el resto (17 − 15 = 2)." },
+    { q: "¿Por qué no compila este código?", code: `if (a > b) then
+  writeln(a);
+else
+  writeln(b);`, ops: ["Falta begin/end", "Hay un ; antes del else", "writeln no acepta enteros", "Falta el paréntesis del else"], ok: 1, exp: "El ; termina el if. El else queda suelto y el compilador lo rechaza." },
+    { q: "¿Qué pasa si escribís <code>if x > 5 and x < 10 then</code> sin paréntesis?", ops: ["Funciona igual", "Error: and se evalúa primero (5 and x)", "Se evalúa de derecha a izquierda", "Solo falla con reales"], ok: 1, exp: "and tiene más prioridad que los relacionales, así que Pascal intenta calcular 5 and x primero. Cada comparación va entre paréntesis." },
+    { q: "Leés 1000 números y querés los dos mínimos. Llega un número menor que <code>min1</code>. ¿Qué hacés?", ops: ["min1 := num", "min2 := num", "min2 := min1; min1 := num", "min1 := num; min2 := min1"], ok: 2, exp: "Primero el viejo mínimo pasa a ser el segundo, después guardás el nuevo. Al revés perdés el valor anterior." },
+    { q: "Para leer exactamente 200 productos, ¿qué estructura es la adecuada?", ops: ["while", "repeat-until", "for", "case"], ok: 2, exp: "Cantidad conocida de antemano: for." },
+    { q: "Con <code>num := 2504</code>, ¿qué imprime este fragmento?", code: `cant := 0;
+while (num <> 0) do begin
+  if (num mod 10) mod 2 = 0 then
+    cant := cant + 1;
+  num := num div 10;
+end;
+writeln(cant);`, ops: ["2", "3", "4", "1"], ok: 1, exp: "Dígitos 4, 0, 5, 2: son pares el 4, el 0 y el 2. El 0 cuenta como par." }
+  ],
+  ejercicios: [
+    { ref: "P1·1 Ej 5", titulo: "Legajos y promedios",
+      enunciado: "Leer legajo y promedio de cada alumno hasta el legajo -1 (no se procesa). Informar: cantidad de alumnos, cantidad con promedio mayor a 6.5 y porcentaje de destacados (promedio > 8.5) con legajo menor a 2500.",
+      pista: "Lectura previa del legajo + while. El promedio se lee adentro del bucle, solo si el legajo no es -1. Ojo con dividir por cero al calcular el porcentaje.",
+      sol: `program legajos;
+var
+  legajo, cant, cantMas65, cantDest : integer;
+  prom : real;
+begin
+  cant := 0; cantMas65 := 0; cantDest := 0;
+  read(legajo);
+  while (legajo <> -1) do begin
+    read(prom);
+    cant := cant + 1;
+    if (prom > 6.5) then
+      cantMas65 := cantMas65 + 1;
+    if (prom > 8.5) and (legajo < 2500) then
+      cantDest := cantDest + 1;
+    read(legajo);
+  end;
+  writeln('Alumnos leídos: ', cant);
+  writeln('Promedio mayor a 6.5: ', cantMas65);
+  if (cant > 0) then
+    writeln('Destacados con legajo < 2500: ', cantDest / cant * 100 :0:2, '%');
+end.` },
+    { ref: "P1·1 Ej 8", titulo: "Suma o resta de una secuencia",
+      enunciado: "Leer un carácter '+' o '-' (si es otro, informar error y terminar). Después leer enteros hasta el 0 y aplicar la operación. Ej: '-' con 4 3 5 -6 0 imprime 2.",
+      pista: "El primer número es el valor inicial; la operación se aplica a partir del segundo. Para leer un char y después números conviene readln en el carácter.",
+      sol: `program operacion;
+var
+  op : char;
+  num, res : integer;
+begin
+  readln(op);
+  if (op <> '+') and (op <> '-') then
+    writeln('Error: operación inválida')
+  else begin
+    read(num);
+    res := num;               { el primero es el valor inicial }
+    if (num <> 0) then
+      read(num);
+    while (num <> 0) do begin
+      if (op = '+') then
+        res := res + num
+      else
+        res := res - num;
+      read(num);
+    end;
+    writeln(res);
+  end;
+end.` },
+    { ref: "P1·2 Ej 4", titulo: "Los dos mínimos",
+      enunciado: "Leer 1000 enteros e informar los dos números mínimos. (a) La lectura termina con 0, que se procesa. (b) Termina con 0, que no se procesa.",
+      pista: "Para 1000 números: for. Variante (a): repeat-until. Variante (b): lectura previa + while. La actualización de min1/min2 es igual en las tres.",
+      sol: `program dosMinimos;
+var
+  i, num, min1, min2 : integer;
+begin
+  min1 := 32767; min2 := 32767;
+  for i := 1 to 1000 do begin
+    read(num);
+    if (num < min1) then begin
+      min2 := min1;
+      min1 := num;
+    end
+    else if (num < min2) then
+      min2 := num;
+  end;
+  writeln('Mínimos: ', min1, ' y ', min2);
+end.
+{ (a) repeat read(num); actualizar; until (num = 0);
+  (b) read(num); while (num <> 0) do begin actualizar; read(num); end; }` },
+    { ref: "P1·2 Ej 8", titulo: "Ventas del mes",
+      enunciado: "Para cada uno de los 31 días se leen montos de venta hasta el monto 0. Informar la cantidad de ventas por día y el monto total del mes. (a) Además, el día con más ventas.",
+      pista: "Un for de 1 a 31 por fuera y un while por dentro. El contador de ventas se reinicia en cada día; el total del mes no.",
+      sol: `program ventasMes;
+var
+  dia, cantDia, maxCant, diaMax : integer;
+  monto, total : real;
+begin
+  total := 0; maxCant := -1; diaMax := 0;
+  for dia := 1 to 31 do begin
+    cantDia := 0;
+    read(monto);
+    while (monto <> 0) do begin
+      cantDia := cantDia + 1;
+      total := total + monto;
+      read(monto);
+    end;
+    writeln('Día ', dia, ': ', cantDia, ' ventas');
+    if (cantDia > maxCant) then begin
+      maxCant := cantDia;
+      diaMax := dia;
+    end;
+  end;
+  writeln('Total del mes: ', total:0:2);
+  writeln('Día con más ventas: ', diaMax);
+end.` },
+    { ref: "P1·3 Act 1", titulo: "Revisando inversiones",
+      enunciado: "Por cada empresa se lee código, cantidad de inversiones y el monto de cada una. Termina con la empresa 100, que se procesa. Informar el promedio de cada empresa, el código de la de mayor monto total y cuántas tienen inversiones de más de $50000.",
+      pista: "repeat-until por fuera (la 100 se procesa) y un for por dentro para los montos. \"Inversiones de más de $50000\" se interpreta como el total de la empresa.",
+      sol: `program inversiones;
+var
+  codigo, cantInv, i, codMax, cantMas50 : integer;
+  monto, total, maxTotal : real;
+begin
+  maxTotal := -1; cantMas50 := 0; codMax := 0;
+  repeat
+    read(codigo);
+    read(cantInv);
+    total := 0;
+    for i := 1 to cantInv do begin
+      read(monto);
+      total := total + monto;
+    end;
+    if (cantInv > 0) then
+      writeln('Empresa ', codigo, ' monto promedio ', total / cantInv :0:2);
+    if (total > maxTotal) then begin
+      maxTotal := total;
+      codMax := codigo;
+    end;
+    if (total > 50000) then
+      cantMas50 := cantMas50 + 1;
+  until (codigo = 100);
+  writeln('Mayor monto invertido: empresa ', codMax);
+  writeln('Empresas con más de $50000: ', cantMas50);
+end.` }
+  ]
+});
+
+TEMAS.push({
+  id: "modulos", num: "P2·1", titulo: "Funciones y procedimientos",
+  fuente: "Práctica 2 (parte 1)",
+  resumen: "Cómo partir un programa en módulos, la diferencia entre función y procedimiento, y las reglas de alcance de las variables.",
+  sim: null,
+  teoria: [
+    { h: "¿Por qué modularizar?" },
+    { p: "Un módulo resuelve una parte del problema con una tarea bien definida. Se gana legibilidad, reuso (lo invocás muchas veces) y es más fácil encontrar errores, porque cada módulo se prueba por separado." },
+    { h: "Procedimiento o función" },
+    { table: [
+      ["", "Procedimiento", "Función"],
+      ["Devuelve", "0, 1 o más valores (por parámetros var)", "Exactamente un valor de tipo simple"],
+      ["Se invoca", "Como una sentencia: <code>leer(a);</code>", "Dentro de una expresión: <code>x := doble(a);</code>"],
+      ["Retorno", "No tiene", "Se asigna al nombre: <code>doble := n * 2;</code>"]
+    ] },
+    { code: `function esPar(n : integer) : boolean;
+begin
+  esPar := (n mod 2 = 0);
+end;
+
+procedure informar(n : integer);
+begin
+  if esPar(n) then
+    writeln(n, ' es par')
+  else
+    writeln(n, ' es impar');
+end;` },
+    { tip: "Una función tiene que asignar su nombre en <b>todos</b> los caminos posibles. Si un if no cubre un caso, la función devuelve basura." },
+    { h: "Alcance: global, local y parámetro" },
+    { list: [
+      "<b>Local</b>: declarada dentro del módulo. Existe solo mientras el módulo se ejecuta.",
+      "<b>Global</b>: declarada en el programa <i>antes</i> de los módulos. La ve todo el código que está debajo.",
+      "Las variables del programa principal se declaran <b>después</b> de los módulos, así los módulos no pueden verlas. Es lo correcto.",
+      "Si una local se llama igual que una global, dentro del módulo gana la local (la global queda oculta)."
+    ] },
+    { code: `program alcance1;
+var a, b : integer;          { globales }
+procedure uno;
+var b : integer;             { local: oculta a la global b }
+begin
+  b := 3;
+  writeln(b);                { 3 }
+end;
+begin
+  a := 1; b := 2;
+  uno;
+  writeln(b, a);             { 21: la b global no cambió }
+end.` },
+    { tip: "A partir de la práctica 3 no se usan variables globales. Todo lo que un módulo necesita entra y sale por parámetros." },
+    { h: "Módulos anidados" },
+    { p: "Un módulo declarado dentro de otro solo puede invocarse desde ese módulo. Si el programa principal lo necesita, hay que declararlo afuera, en el nivel del programa." }
+  ],
+  quiz: [
+    { q: "¿Qué imprime <code>alcance2</code>?", code: `program alcance2;
+var a, b : integer;
+procedure uno;
+begin
+  b := 3;
+  writeln(b);
+end;
+begin
+  a := 1; b := 2;
+  uno;
+  writeln(b, a);
+end.`, ops: ["3 y luego 21", "3 y luego 31", "2 y luego 21", "Error de compilación"], ok: 1, exp: "uno no declara b, así que modifica la global. Al volver, b vale 3." },
+    { q: "En <code>alcance3</code>, el programa principal hace <code>writeln(a, b)</code> pero <code>b</code> está declarada solo dentro de <code>uno</code>. ¿Qué pasa?", ops: ["Imprime 1 y 2", "Imprime 1 y basura", "Error de compilación: b no está declarada en ese alcance", "Imprime 1 y 0"], ok: 2, exp: "b es local a uno. Fuera del procedimiento no existe y el compilador la rechaza." },
+    { q: "¿Qué está mal en este programa?", code: `function cuatro : integer;
+begin
+  cuatro := 4;
+end;
+var a : integer;
+begin
+  cuatro;
+  writeln(a);
+end.`, ops: ["La función no tiene parámetros", "Una función se usa en una expresión: falta a := cuatro;", "cuatro debería ser real", "Nada, imprime 4"], ok: 1, exp: "El valor que devuelve la función se pierde y a nunca se inicializa. Lo correcto es a := cuatro;." },
+    { q: "Una función calcula <code>prom</code> pero nunca hace <code>calcularPromedio := prom</code>. ¿Qué devuelve?", ops: ["prom", "0", "Un valor indefinido (basura)", "Error al compilar siempre"], ok: 2, exp: "El nombre de la función nunca recibió valor. Hay que agregar calcularPromedio := prom al final." },
+    { q: "¿Cuál de estas tareas <b>no</b> puede resolverse con una función?", ops: ["Devolver si un número es par", "Devolver el mayor de dos números", "Devolver la cantidad de dígitos y su suma", "Devolver el promedio de dos reales"], ok: 2, exp: "Son dos resultados. Una función devuelve uno solo; para dos hace falta un procedimiento con dos parámetros var." },
+    { q: "La función <code>analizarLetra</code> está declarada dentro del procedimiento <code>leer</code>. ¿Puede invocarla el programa principal?", ops: ["Sí, siempre", "No: solo es visible dentro de leer", "Sí, si se pasa por parámetro", "Solo si es boolean"], ok: 1, exp: "Un módulo anidado es local al módulo que lo contiene. Para usarla desde el principal hay que declararla afuera." },
+    { q: "Si <code>analizarLetra</code> solo contempla minúsculas y mayúsculas, ¿qué pasa al ingresar '5'?", ops: ["Devuelve false", "Devuelve true", "Devuelve un valor indefinido", "El programa termina"], ok: 2, exp: "Ningún if asigna el nombre de la función. Se arregla agregando un else final que asigne un valor." }
+  ],
+  ejercicios: [
+    { ref: "P2·1 Ej 4", titulo: "alcance4a vs alcance4b",
+      enunciado: "En 4a las variables a y b se declaran antes del procedimiento uno; en 4b se declaran después. Explicar la diferencia.",
+      pista: "¿Qué variables ve uno en cada caso?",
+      sol: `{ 4a: a y b son globales y uno las ve.
+       uno asigna a := 1 sobre la global.
+       Imprime: 1 y luego 21. }
+
+{ 4b: uno se declara antes que a y b,
+       así que dentro de uno 'a' no existe.
+       Error de compilación: identificador no declarado. }` },
+    { ref: "P2·1 Ej 6", titulo: "El par más alto",
+      enunciado: "(a) Módulo que lea enteros hasta un negativo e imprima el número par más alto. (b) Programa que lo invoque.",
+      pista: "Un procedimiento sin parámetros alcanza, porque lee e imprime solo. Inicializá el máximo en un valor que ningún dato válido pueda tener.",
+      sol: `program parMasAlto;
+procedure procesar;
+var
+  num, max : integer;
+begin
+  max := -1;
+  read(num);
+  while (num >= 0) do begin
+    if (num mod 2 = 0) and (num > max) then
+      max := num;
+    read(num);
+  end;
+  if (max = -1) then
+    writeln('No se leyeron pares')
+  else
+    writeln('El par más alto es ', max);
+end;
+begin
+  procesar;
+end.` },
+    { ref: "P2·1 Ej 7", titulo: "calcularPromedio",
+      enunciado: "Corregir la función calcularPromedio (globales suma y cant), invocarla una sola vez y decir qué imprime con suma = 48 y cant = 6 en cada versión.",
+      pista: "Falta asignar el nombre de la función. Para invocarla una sola vez, guardá el resultado en una variable. En el original, además, se hace cant := 0 antes de la segunda llamada.",
+      sol: `{ a) Agregar al final de la función:
+       calcularPromedio := prom;
+  b) var p : real;
+     p := calcularPromedio;
+     if (p <> -1) then writeln('El promedio es: ', p)
+     else writeln('Dividir por cero no parece ser una buena idea');
+  c) i)   Original: el resultado es indefinido (la función no asigna su nombre).
+     ii)  Con (a): la primera llamada da 8, pero antes de la segunda
+          se pone cant := 0, así que imprime -1.
+     iii) Con (a) y (b): imprime 8. }` }
+  ]
+});
+
+TEMAS.push({
+  id: "parametros", num: "P2·2", titulo: "Parámetros",
+  fuente: "Práctica 2 (parte 2)",
+  resumen: "Pasaje por valor y por referencia, cómo devolver varios resultados y cómo hacer pruebas de escritorio con módulos.",
+  sim: "parametros",
+  teoria: [
+    { h: "Por valor y por referencia" },
+    { table: [
+      ["", "Por valor", "Por referencia (var)"],
+      ["Qué recibe el módulo", "Una copia del dato", "La variable original (un alias)"],
+      ["Si el módulo la modifica", "El cambio se pierde al salir", "El cambio queda en la variable"],
+      ["Qué se puede pasar", "Variable, constante o expresión", "Solo una variable"],
+      ["Uso típico", "Datos de entrada", "Resultados que el módulo devuelve"]
+    ] },
+    { code: `procedure suma(num1 : integer; var num2 : integer);
+begin
+  num2 := num1 + num2;   { cambia la variable original }
+  num1 := 0;             { cambia solo la copia }
+end;` },
+    { h: "Reglas de correspondencia" },
+    { p: "Los parámetros reales (en la invocación) y los formales (en el encabezado) se emparejan por <b>posición</b>. Tienen que coincidir en cantidad, orden y tipo. Los nombres no importan." },
+    { code: `procedure leerDatos(var legajo : integer; var salario : real);
+...
+leerDatos(leg, sal);       { bien }
+leerDatos(sal, leg);       { mal: tipos invertidos }` },
+    { h: "Devolver varios resultados" },
+    { p: "Cuando un módulo tiene que devolver más de un valor, se usa un procedimiento con varios parámetros por referencia." },
+    { code: `procedure analizar(num : integer; var cantDig, suma : integer);
+begin
+  cantDig := 0; suma := 0;
+  repeat
+    cantDig := cantDig + 1;
+    suma := suma + num mod 10;
+    num := num div 10;
+  until (num = 0);
+end;` },
+    { tip: "num se pasa por valor: el módulo lo destruye dividiéndolo por 10, pero en el programa principal el número sigue intacto." },
+    { h: "Cuándo usar cada uno" },
+    { list: [
+      "Un solo resultado simple → función.",
+      "Varios resultados, o un registro, vector o lista que se modifica → procedimiento con <code>var</code>.",
+      "Datos que el módulo solo consulta → por valor. (Las estructuras grandes a veces se pasan por referencia para no copiarlas, aunque no se modifiquen.)"
+    ] }
+  ],
+  quiz: [
+    { q: "Con <code>procedure suma(num1 : integer; var num2 : integer)</code>, leés x = 10 y hacés <code>for i := 1 to 5 do suma(i, x)</code>. ¿Qué imprime <code>write(x)</code>?", ops: ["10", "15", "25", "0"], ok: 2, exp: "x es la variable original: 10 + 1 + 2 + 3 + 4 + 5 = 25." },
+    { q: "Mismo programa, pero ahora <code>num2</code> es por valor. ¿Qué imprime?", ops: ["10", "25", "15", "Error"], ok: 0, exp: "suma trabaja sobre una copia de x. El valor original nunca cambia." },
+    { q: "¿Se puede invocar <code>sumar(a, b, 0)</code> si el tercer parámetro es <code>var c : integer</code>?", ops: ["Sí", "No: por referencia solo se pasan variables", "Solo si c es real", "Sí, pero c vale 0 siempre"], ok: 1, exp: "Un parámetro var necesita una variable donde dejar el resultado. Un literal no sirve." },
+    { q: "¿Qué imprime <code>digParesImpares</code> con la secuencia 250, 35, 100?", ops: ["Pares: 4  Ímpares: 4", "Pares: 2  Ímpares: 3", "Pares: 3  Ímpares: 4", "Pares: 4  Ímpares: 3"], ok: 0, exp: "250 → pares 0 y 2, impar 5. 35 → dos impares. 100 → pares 0 y 0, impar 1. Total: 4 pares y 4 impares (par e impar se acumulan entre llamadas porque son var)." },
+    { q: "¿Qué pasa si un procedimiento declara <code>var salario : real</code> y lo invocás con una variable integer?", ops: ["Convierte automáticamente", "Error: el tipo tiene que coincidir exactamente", "Funciona pero redondea", "Solo da error en ejecución"], ok: 1, exp: "En el pasaje por referencia los tipos deben ser idénticos." },
+    { q: "Un módulo debe recibir un número y devolver la cantidad de dígitos y su suma. ¿Qué encabezado es correcto?", ops: ["function digitos(n : integer) : integer;", "procedure digitos(n : integer; cant, suma : integer);", "procedure digitos(n : integer; var cant, suma : integer);", "procedure digitos(var n, cant, suma : integer);"], ok: 2, exp: "Dos resultados: procedimiento con dos var. n va por valor porque el módulo lo modifica y no hay que romper el original." }
+  ],
+  ejercicios: [
+    { ref: "P2·2 Ej 3", titulo: "Los 6 errores de sumar",
+      enunciado: "El programa ejercicio5 debe sumar los números entre a y b y devolver el resultado en c, e informar si quedó entre 10 y 30. Encontrar los 6 errores.",
+      pista: "Revisá: encabezado, variables no declaradas, variables sin inicializar, pasaje por referencia y la condición lógica.",
+      sol: `{ 1. Línea 3: falta ';' al final y c debe ser 'var c : integer'
+     para devolver el resultado.
+  2. Línea 8: i no está declarada (debe ser local de sumar).
+  3. Línea 9: suma no está inicializada en 0.
+  4. Línea 16: a y b no están declaradas en el programa principal.
+  5. Línea 17: se pasa el literal 0; hay que pasar result.
+  6. Línea 20: debe ser 'and' (con 'or' siempre da true)
+     y ok no está declarada (boolean). }` },
+    { ref: "P2·2 Ej 4", titulo: "Errores en programadores",
+      enunciado: "Leer 130 programadores (legajo y salario) e imprimir el total de salarios y el salario del de mayor legajo. El código tiene 5 errores.",
+      pista: "Mirá qué parámetros deberían ser var, el orden de los parámetros en la línea 23 y qué variables se usan sin inicializar o sin declarar.",
+      sol: `{ 1. Línea 2: salario debe ser var (si no, el valor leído se pierde).
+  2. Línea 4: la cadena abre con ' y cierra con ".
+  3. Línea 8-10: maxSalario es local; debe ser un parámetro var
+     para que llegue al programa principal.
+  4. Línea 21: sumaSalarios no está declarada, y maxLegajo
+     no se inicializa (debería empezar en -1).
+  5. Línea 23: los parámetros están invertidos:
+     leerDatos(legajo, salario). }` },
+    { ref: "P2·2 Ej 7", titulo: "Cantidad y suma de dígitos",
+      enunciado: "(a) Módulo que reciba un entero y devuelva la cantidad de dígitos y su suma. (b) Leer números hasta uno cuyos dígitos sumen 10 (se procesa) e imprimir el total de dígitos leídos.",
+      pista: "El corte se procesa: repeat-until. Usá el módulo del inciso a dentro del bucle.",
+      sol: `program digitos;
+procedure analizar(num : integer; var cant, suma : integer);
+begin
+  cant := 0; suma := 0;
+  repeat
+    cant := cant + 1;
+    suma := suma + num mod 10;
+    num := num div 10;
+  until (num = 0);
+end;
+var
+  num, cant, suma, total : integer;
+begin
+  total := 0;
+  repeat
+    read(num);
+    analizar(num, cant, suma);
+    total := total + cant;
+  until (suma = 10);
+  writeln('Dígitos leídos: ', total);
+end.` },
+    { ref: "P2·2 Ej 10", titulo: "Patrón A$B#",
+      enunciado: "Leer caracteres y verificar el patrón A$B#: A solo vocales, B solo letras no vocales. $ y # seguro existen. Si falla, informar qué parte.",
+      pista: "Un módulo por parte del patrón, cada uno devuelve si se cumplió. Si A falla, no tiene sentido seguir con B.",
+      sol: `program patron;
+function esVocal(c : char) : boolean;
+begin
+  esVocal := (c = 'a') or (c = 'e') or (c = 'i') or (c = 'o') or (c = 'u')
+          or (c = 'A') or (c = 'E') or (c = 'I') or (c = 'O') or (c = 'U');
+end;
+function esLetra(c : char) : boolean;
+begin
+  esLetra := ((c >= 'a') and (c <= 'z')) or ((c >= 'A') and (c <= 'Z'));
+end;
+procedure parteA(var ok : boolean);
+var c : char;
+begin
+  ok := true;
+  read(c);
+  while (c <> '$') and ok do begin
+    if not esVocal(c) then ok := false
+    else read(c);
+  end;
+end;
+procedure parteB(var ok : boolean);
+var c : char;
+begin
+  ok := true;
+  read(c);
+  while (c <> '#') and ok do begin
+    if not esLetra(c) or esVocal(c) then ok := false
+    else read(c);
+  end;
+end;
+var ok : boolean;
+begin
+  parteA(ok);
+  if not ok then
+    writeln('No se cumple la parte A')
+  else begin
+    parteB(ok);
+    if not ok then writeln('No se cumple la parte B')
+    else writeln('La secuencia cumple el patrón');
+  end;
+end.` },
+    { ref: "P2·2 Ej 12", titulo: "Rendimiento de la soja",
+      enunciado: "(a) Módulo que reciba hectáreas, tipo de zona (1: 6 tn/ha, 2: 2,6 tn/ha, 3: 1,4 tn/ha) y precio por tonelada, y devuelva el rendimiento. (b) Leer campos (localidad, ha, zona) hasta uno de 900 ha en Saladillo (se procesa); precio U$S 320. Informar: campos de Tres de Febrero con rendimiento > 10000, localidad de mayor y de menor rendimiento, y el promedio.",
+      pista: "Un solo valor → función. El corte se procesa y depende de dos campos: repeat-until con (ha = 900) and (localidad = 'Saladillo').",
+      sol: `program soja;
+const PRECIO = 320;
+function rendimiento(ha : real; zona : integer; precio : real) : real;
+var tnHa : real;
+begin
+  case zona of
+    1: tnHa := 6;
+    2: tnHa := 2.6;
+  else
+    tnHa := 1.4;
+  end;
+  rendimiento := ha * tnHa * precio;
+end;
+var
+  loc, locMax, locMin : string;
+  ha, r, max, min, suma : real;
+  zona, cant, cantTdF : integer;
+begin
+  max := -1; min := 1e30; suma := 0; cant := 0; cantTdF := 0;
+  repeat
+    readln(loc); readln(ha); readln(zona);
+    r := rendimiento(ha, zona, PRECIO);
+    cant := cant + 1;
+    suma := suma + r;
+    if (loc = 'Tres de Febrero') and (r > 10000) then
+      cantTdF := cantTdF + 1;
+    if (r > max) then begin max := r; locMax := loc; end;
+    if (r < min) then begin min := r; locMin := loc; end;
+  until (ha = 900) and (loc = 'Saladillo');
+  writeln('Tres de Febrero con más de U$S 10000: ', cantTdF);
+  writeln('Mayor rendimiento: ', locMax);
+  writeln('Menor rendimiento: ', locMin);
+  writeln('Promedio: ', suma / cant :0:2);
+end.` }
+  ]
+});
+
+TEMAS.push({
+  id: "registros", num: "P3", titulo: "Registros",
+  fuente: "Práctica 3",
+  resumen: "Agrupar datos de una misma entidad en un tipo record y procesar información ordenada con corte de control.",
+  sim: "corte",
+  teoria: [
+    { h: "Definir y usar un registro" },
+    { p: "Un registro agrupa campos de tipos distintos que describen una misma cosa. Se declara en <code>type</code> y se accede a cada campo con un punto." },
+    { code: `type
+  str20 = string[20];
+  fecha = record
+    dia, mes, anio : integer;
+  end;
+  alumno = record
+    codigo   : integer;
+    nombre   : str20;
+    promedio : real;
+    ingreso  : fecha;       { un registro dentro de otro }
+  end;
+var
+  a, b : alumno;
+begin
+  a.codigo := 1234;
+  a.ingreso.anio := 2026;
+  b := a;                   { asignación completa: mismo tipo }
+end.` },
+    { h: "Lo que no se puede hacer" },
+    { list: [
+      "<code>read(a)</code> o <code>writeln(a)</code> con el registro completo: se lee y escribe campo por campo.",
+      "<code>if (a = b)</code>: los registros se comparan campo por campo.",
+      "Una función no puede devolver un registro: se usa un procedimiento con parámetro <code>var</code>."
+    ] },
+    { code: `procedure leerAlumno(var alu : alumno);
+begin
+  read(alu.codigo);
+  if (alu.codigo <> 0) then begin
+    read(alu.nombre);
+    read(alu.promedio);
+  end;
+end;` },
+    { h: "Corte de control" },
+    { p: "Cuando el enunciado dice que la información \"se ingresa ordenada por marca\" (o por universidad, localidad, etc.), los datos de un mismo grupo llegan juntos. Eso permite calcular totales por grupo sin guardar nada: un bucle externo recorre grupos y uno interno recorre los elementos del grupo actual." },
+    { code: `leerAuto(a);
+while (a.marca <> 'ZZZ') do begin
+  marcaActual := a.marca;
+  cant := 0; suma := 0;
+  while (a.marca = marcaActual) do begin   { mismo grupo }
+    cant := cant + 1;
+    suma := suma + a.precio;
+    leerAuto(a);
+  end;
+  writeln(marcaActual, ': promedio ', suma / cant :0:2);
+end;` },
+    { tip: "La condición del bucle interno también debe controlar el fin de datos si el valor de corte podría coincidir con el grupo actual. Con 'ZZZ' como marca de fin no hace falta, porque ninguna marca real es 'ZZZ'." },
+    { p: "Con dos niveles (por localidad y, dentro, por escuela) se anida un bucle más: cada nivel tiene su variable <code>actual</code> y sus contadores." }
+  ],
+  quiz: [
+    { q: "¿Cuál de estas sentencias es válida si <code>a</code> y <code>b</code> son del mismo tipo registro?", ops: ["read(a)", "if (a = b) then", "b := a", "writeln(a)"], ok: 2, exp: "La asignación completa entre registros del mismo tipo está permitida. Leer, escribir y comparar se hace campo a campo." },
+    { q: "Un módulo debe leer un registro completo. ¿Cómo lo declarás?", ops: ["function leer : alumno;", "procedure leer(var a : alumno);", "procedure leer(a : alumno);", "function leer(var a : alumno) : boolean;"], ok: 1, exp: "Las funciones devuelven tipos simples. Un procedimiento con var deja el registro cargado en la variable del llamador." },
+    { q: "\"La información se ingresa ordenada por marca\". ¿Qué técnica habilita eso?", ops: ["Búsqueda dicotómica", "Corte de control", "Vector contador", "Insertar ordenado"], ok: 1, exp: "Los autos de una misma marca llegan consecutivos, así que podés procesar marca por marca con un while anidado." },
+    { q: "En un corte de control, ¿dónde se inicializan los contadores de cada grupo?", ops: ["Antes del while externo", "Dentro del while externo, antes del interno", "Dentro del while interno", "Después del while externo"], ok: 1, exp: "Cada grupo empieza de cero. Se inicializan al entrar a un grupo nuevo, antes del bucle interno." },
+    { q: "¿Cuántos bytes ocupa <code>fecha = record dia, mes, anio : integer; end;</code> con la tabla de la cátedra (integer = 2)?", ops: ["2", "3", "6", "12"], ok: 2, exp: "Un registro ocupa la suma de sus campos: 3 × 2 = 6 bytes." },
+    { q: "¿Cómo accedés al año de ingreso de <code>a</code> si <code>ingreso</code> es un registro <code>fecha</code>?", ops: ["a.anio", "a.ingreso.anio", "ingreso.a.anio", "a[ingreso].anio"], ok: 1, exp: "Se encadenan los puntos desde afuera hacia adentro." }
+  ],
+  ejercicios: [
+    { ref: "P3 Ej 1", titulo: "Alumno con mejor promedio",
+      enunciado: "Usando el módulo leer, leer alumnos hasta el código 0 (no se procesa). Informar cuántos se leyeron y el nombre del de mejor promedio.",
+      pista: "El módulo leer ya contempla el código 0, así que encaja con lectura previa + while.",
+      sol: `program Registros;
+type
+  str20 = string[20];
+  alumno = record
+    codigo : integer;
+    nombre : str20;
+    promedio : real;
+  end;
+procedure leer(var alu : alumno);
+begin
+  read(alu.codigo);
+  if (alu.codigo <> 0) then begin
+    readln(alu.nombre);
+    read(alu.promedio);
+  end;
+end;
+var
+  a : alumno;
+  cant : integer;
+  maxProm : real;
+  mejor : str20;
+begin
+  cant := 0; maxProm := -1; mejor := '';
+  leer(a);
+  while (a.codigo <> 0) do begin
+    cant := cant + 1;
+    if (a.promedio > maxProm) then begin
+      maxProm := a.promedio;
+      mejor := a.nombre;
+    end;
+    leer(a);
+  end;
+  writeln('Alumnos leídos: ', cant);
+  writeln('Mejor promedio: ', mejor);
+end.` },
+    { ref: "P3 Ej 2", titulo: "Casamientos 2019",
+      enunciado: "Definir un tipo fecha, un módulo que la lea, y leer fechas de casamientos de 2019 hasta el año 2020 (no se procesa). Informar cuántos fueron en verano (enero a marzo) y cuántos en los primeros 10 días de cada mes.",
+      pista: "El corte depende del año: el módulo puede leer el año primero. Las dos condiciones son independientes (un casamiento puede contar en ambas).",
+      sol: `program casamientos;
+type
+  fecha = record
+    dia, mes, anio : integer;
+  end;
+procedure leerFecha(var f : fecha);
+begin
+  read(f.anio);
+  if (f.anio <> 2020) then begin
+    read(f.mes);
+    read(f.dia);
+  end;
+end;
+var
+  f : fecha;
+  verano, primeros10 : integer;
+begin
+  verano := 0; primeros10 := 0;
+  leerFecha(f);
+  while (f.anio <> 2020) do begin
+    if (f.mes <= 3) then verano := verano + 1;
+    if (f.dia <= 10) then primeros10 := primeros10 + 1;
+    leerFecha(f);
+  end;
+  writeln('En verano: ', verano);
+  writeln('En los primeros 10 días: ', primeros10);
+end.` },
+    { ref: "P3 Ej 5", titulo: "Precio promedio por marca",
+      enunciado: "Leer autos (marca, modelo, precio) hasta la marca 'ZZZ' (no se procesa), ordenados por marca. Informar el precio promedio por marca y la marca y modelo del más caro.",
+      pista: "Corte de control por marca. El más caro se actualiza en el bucle interno, comparando contra un máximo general.",
+      sol: `program concesionaria;
+type
+  str20 = string[20];
+  auto = record
+    marca, modelo : str20;
+    precio : real;
+  end;
+procedure leerAuto(var a : auto);
+begin
+  readln(a.marca);
+  if (a.marca <> 'ZZZ') then begin
+    readln(a.modelo);
+    readln(a.precio);
+  end;
+end;
+var
+  a : auto;
+  actual, marcaMax, modeloMax : str20;
+  cant : integer;
+  suma, max : real;
+begin
+  max := -1;
+  leerAuto(a);
+  while (a.marca <> 'ZZZ') do begin
+    actual := a.marca;
+    cant := 0; suma := 0;
+    while (a.marca = actual) do begin
+      cant := cant + 1;
+      suma := suma + a.precio;
+      if (a.precio > max) then begin
+        max := a.precio;
+        marcaMax := a.marca;
+        modeloMax := a.modelo;
+      end;
+      leerAuto(a);
+    end;
+    writeln(actual, ': promedio ', suma / cant :0:2);
+  end;
+  writeln('Más caro: ', marcaMax, ' ', modeloMax);
+end.` },
+    { ref: "P3 Ej 4", titulo: "Facturación de telefonía",
+      enunciado: "Para 9300 clientes se lee código y cantidad de líneas; de cada línea, número, minutos y MB. Con un módulo que lea una línea y otro que lea todas las líneas de un cliente y devuelva el total de minutos y MB, informar el monto a facturar ($3,40 por minuto y $1,35 por MB).",
+      pista: "El módulo del inciso b recibe el cliente (o su cantidad de líneas) y devuelve dos valores: procedimiento con dos var.",
+      sol: `program telefonia;
+type
+  linea = record
+    numero : longint;
+    minutos, mb : real;
+  end;
+  cliente = record
+    codigo, cantLineas : integer;
+  end;
+procedure leerLinea(var l : linea);
+begin
+  read(l.numero, l.minutos, l.mb);
+end;
+procedure procesarCliente(c : cliente; var totMin, totMB : real);
+var
+  i : integer;
+  l : linea;
+begin
+  totMin := 0; totMB := 0;
+  for i := 1 to c.cantLineas do begin
+    leerLinea(l);
+    totMin := totMin + l.minutos;
+    totMB := totMB + l.mb;
+  end;
+end;
+var
+  c : cliente;
+  i : integer;
+  mins, mbs : real;
+begin
+  for i := 1 to 9300 do begin
+    read(c.codigo, c.cantLineas);
+    procesarCliente(c, mins, mbs);
+    writeln('Cliente ', c.codigo, ': $', mins * 3.40 + mbs * 1.35 :0:2);
+  end;
+end.` }
+  ]
+});
+/* ====== CONTENIDO: temas 5 a 8 ====== */
+TEMAS.push({
+  id: "vectores", num: "P4", titulo: "Vectores",
+  fuente: "Práctica 4 (partes 1 y 2)",
+  resumen: "Dimensión física y lógica, carga, recorridos, vectores contadores, búsqueda, inserción y eliminación con corrimientos.",
+  sim: "vector",
+  teoria: [
+    { h: "Declaración" },
+    { p: "Un vector es una estructura estática, homogénea e indexada: todos los elementos son del mismo tipo y se accede a cada uno por su posición." },
+    { code: `const
+  DIMF = 300;                         { dimensión física }
+type
+  vSalarios = array [1..DIMF] of real;
+var
+  v : vSalarios;
+  dimL : integer;                     { dimensión lógica } ` },
+    { h: "Dimensión física y lógica" },
+    { list: [
+      "<b>dimF</b>: la cantidad de lugares reservados. Es fija y se decide al declarar.",
+      "<b>dimL</b>: cuántos lugares están ocupados de verdad. Empieza en 0 y cambia al cargar, insertar o eliminar.",
+      "Si el enunciado dice \"exactamente 400 alumnos\", dimL = dimF y no hace falta llevarla. Si dice \"a lo sumo 400\", sí."
+    ] },
+    { h: "Cargar con dos condiciones de corte" },
+    { code: `procedure cargar(var v : vSalarios; var dimL : integer);
+var sal : real;
+begin
+  dimL := 0;
+  read(sal);
+  while (sal <> 0) and (dimL < DIMF) do begin
+    dimL := dimL + 1;
+    v[dimL] := sal;
+    read(sal);
+  end;
+end;` },
+    { h: "Vector contador" },
+    { p: "Cuando hay que contar \"por cada categoría\" y las categorías son un rango chico (dígitos 0..9, géneros 1..5, meses 1..12), se usa un vector indexado por la categoría. Hay que inicializarlo en 0 antes de usarlo." },
+    { code: `type vContador = array [0..9] of integer;
+var cont : vContador;  i, num : integer;
+...
+for i := 0 to 9 do cont[i] := 0;
+...
+while (num <> 0) do begin
+  cont[num mod 10] := cont[num mod 10] + 1;
+  num := num div 10;
+end;` },
+    { h: "Buscar un elemento" },
+    { p: "En un vector <b>desordenado</b> hay que mirar hasta encontrarlo o llegar a dimL. Si está <b>ordenado</b> se puede cortar antes (cuando pasaste el valor) o usar búsqueda dicotómica." },
+    { code: `{ Desordenado: búsqueda lineal }
+function buscar(v : vNum; dimL, n : integer) : boolean;
+var pos : integer;
+begin
+  pos := 1;
+  while (pos <= dimL) and (v[pos] <> n) do
+    pos := pos + 1;
+  buscar := (pos <= dimL);
+end;
+
+{ Ordenado ascendente: búsqueda dicotómica }
+function buscarDico(v : vNum; dimL, n : integer) : boolean;
+var ini, fin, medio : integer;
+begin
+  ini := 1; fin := dimL; medio := (ini + fin) div 2;
+  while (ini <= fin) and (v[medio] <> n) do begin
+    if (n < v[medio]) then fin := medio - 1
+    else ini := medio + 1;
+    medio := (ini + fin) div 2;
+  end;
+  buscarDico := (ini <= fin);
+end;` },
+    { tip: "El orden de las condiciones importa: <code>(pos &lt;= dimL) and (v[pos] &lt;&gt; n)</code>. Si las invertís, con el elemento ausente terminás leyendo v[dimL + 1]." },
+    { h: "Insertar y eliminar" },
+    { p: "Para insertar en una posición hay que correr los elementos hacia la derecha empezando <b>desde el final</b>. Para eliminar se corren hacia la izquierda empezando desde la posición. Probalo en el simulador." },
+    { code: `procedure insertar(var v : vNum; var dimL : integer;
+                   valor, pos : integer; var ok : boolean);
+var i : integer;
+begin
+  ok := (dimL < DIMF) and (pos >= 1) and (pos <= dimL + 1);
+  if ok then begin
+    for i := dimL downto pos do
+      v[i + 1] := v[i];
+    v[pos] := valor;
+    dimL := dimL + 1;
+  end;
+end;
+
+procedure eliminar(var v : vNum; var dimL : integer;
+                   pos : integer; var ok : boolean);
+var i : integer;
+begin
+  ok := (pos >= 1) and (pos <= dimL);
+  if ok then begin
+    for i := pos to dimL - 1 do
+      v[i] := v[i + 1];
+    dimL := dimL - 1;
+  end;
+end;` },
+    { tip: "\"Realizar todas las validaciones necesarias\": que haya lugar (dimL &lt; dimF) y que la posición sea válida (entre 1 y dimL, o dimL + 1 al insertar)." }
+  ],
+  quiz: [
+    { q: "El enunciado dice \"a lo sumo 300 empleados\" y la carga termina con salario 0. ¿Cuál es la condición del while?", ops: ["(sal <> 0)", "(dimL < DIMF)", "(sal <> 0) and (dimL < DIMF)", "(sal <> 0) or (dimL < DIMF)"], ok: 2, exp: "Hay que cortar por cualquiera de los dos motivos, así que ambas condiciones tienen que seguir siendo verdaderas para continuar." },
+    { q: "Para insertar en la posición 3 de un vector con dimL = 6, ¿desde dónde empezás a correr?", ops: ["Desde la posición 3 hacia la derecha", "Desde la posición 6 (dimL) hacia la 3", "Desde la 1", "No hace falta correr nada"], ok: 1, exp: "Si empezás por la 3, pisás el valor de la 4 antes de moverlo. Hay que ir de dimL hacia pos, con downto." },
+    { q: "¿Qué valores tiene <code>numeros</code> al terminar <code>sumador</code>?", code: `for i := 1 to 10 do
+  numeros[i] := i;
+for i := 2 to 10 do
+  numeros[i] := numeros[i] + numeros[i-1];`, ops: ["1 2 3 4 5 6 7 8 9 10", "1 3 5 7 9 11 13 15 17 19", "1 3 6 10 15 21 28 36 45 55", "2 4 6 8 10 12 14 16 18 20"], ok: 2, exp: "Cada posición acumula la suma de las anteriores (sumas parciales)." },
+    { q: "¿Y si el segundo for fuera <code>for i := 1 to 9 do numeros[i+1] := numeros[i];</code>?", ops: ["Todos valen 1", "1 1 2 3 4 5 6 7 8 9", "Todos valen 10", "Queda igual"], ok: 0, exp: "El 1 de la primera posición se va copiando hacia adelante una y otra vez." },
+    { q: "Para contar ocurrencias de cada dígito, ¿qué estructura conviene?", ops: ["array [1..10] of integer, indexado por dig + 1", "array [0..9] of integer, indexado por el dígito", "Una lista", "Diez variables contador"], ok: 1, exp: "El índice es el propio dígito. El vector debe inicializarse en 0." },
+    { q: "¿Qué precondición necesita la búsqueda dicotómica?", ops: ["Que no haya repetidos", "Que el vector esté ordenado", "Que dimL sea par", "Que dimL = dimF"], ok: 1, exp: "Descarta la mitad en cada paso suponiendo que los menores están a la izquierda y los mayores a la derecha." },
+    { q: "Eliminás el elemento de la posición <code>pos</code>. ¿Qué es lo último que hacés?", ops: ["v[dimL] := 0", "dimL := dimL - 1", "pos := pos - 1", "dimF := dimF - 1"], ok: 1, exp: "Después de correr los elementos a la izquierda, el vector tiene un elemento menos. dimF nunca cambia." }
+  ],
+  ejercicios: [
+    { ref: "P4·1 Ej 6", titulo: "Máximo y mínimo en un recorrido",
+      enunciado: "Implementar un único módulo que recorra el vector una sola vez y devuelva la posición del máximo y la del mínimo.",
+      pista: "Dos resultados → procedimiento con dos var. Arrancá ambas posiciones en 1 y recorré desde la 2.",
+      sol: `procedure maxYMin(v : vNum; dimL : integer; var posMax, posMin : integer);
+var i : integer;
+begin
+  posMax := 1; posMin := 1;
+  for i := 2 to dimL do begin
+    if (v[i] > v[posMax]) then posMax := i;
+    if (v[i] < v[posMin]) then posMin := i;
+  end;
+end;` },
+    { ref: "P4·1 Ej 7", titulo: "Ocurrencias de cada dígito",
+      enunciado: "Leer enteros hasta -1 (no se procesa) e informar cuántas veces aparece cada dígito, el dígito más leído y los que no aparecieron. Ej: 63 34 99 94 96 → 9 aparece 4 veces.",
+      pista: "No se pide guardar los números. Solo hace falta un vector contador de 0..9. Ojo: el número 0 tiene un dígito 0, usá repeat al descomponer.",
+      sol: `program digitos;
+type vCont = array [0..9] of integer;
+procedure inicializar(var c : vCont);
+var i : integer;
+begin
+  for i := 0 to 9 do c[i] := 0;
+end;
+procedure descomponer(num : integer; var c : vCont);
+begin
+  repeat
+    c[num mod 10] := c[num mod 10] + 1;
+    num := num div 10;
+  until (num = 0);
+end;
+procedure informar(c : vCont);
+var i, max, digMax : integer;
+begin
+  max := -1; digMax := 0;
+  for i := 0 to 9 do begin
+    if (c[i] > 0) then writeln('Número ', i, ': ', c[i], ' veces');
+    if (c[i] > max) then begin max := c[i]; digMax := i; end;
+  end;
+  writeln('El dígito más leído fue el ', digMax);
+  write('Sin ocurrencias:');
+  for i := 0 to 9 do
+    if (c[i] = 0) then write(' ', i);
+  writeln;
+end;
+var
+  c : vCont;
+  num : integer;
+begin
+  inicializar(c);
+  read(num);
+  while (num <> -1) do begin
+    descomponer(num, c);
+    read(num);
+  end;
+  informar(c);
+end.` },
+    { ref: "P4·2 Ej 2", titulo: "Nombres: eliminar, insertar, agregar",
+      enunciado: "Cargar nombres (a lo sumo 500) hasta 'ZZZ'. Luego: eliminar la primera ocurrencia de un nombre leído, insertar un nombre en la posición 4 y agregar uno al final. Validar todo.",
+      pista: "Reusá buscar + eliminar(pos), insertar(pos) y agregar. Cada uno devuelve un boolean ok para informar si se pudo.",
+      sol: `const DIMF = 500;
+type
+  str20 = string[20];
+  vNombres = array [1..DIMF] of str20;
+
+function posicion(v : vNombres; dimL : integer; n : str20) : integer;
+var i : integer;
+begin
+  i := 1;
+  while (i <= dimL) and (v[i] <> n) do i := i + 1;
+  if (i <= dimL) then posicion := i else posicion := -1;
+end;
+
+procedure eliminarNombre(var v : vNombres; var dimL : integer;
+                         n : str20; var ok : boolean);
+var pos, i : integer;
+begin
+  pos := posicion(v, dimL, n);
+  ok := (pos <> -1);
+  if ok then begin
+    for i := pos to dimL - 1 do v[i] := v[i + 1];
+    dimL := dimL - 1;
+  end;
+end;
+
+procedure insertarEn(var v : vNombres; var dimL : integer;
+                     n : str20; pos : integer; var ok : boolean);
+var i : integer;
+begin
+  ok := (dimL < DIMF) and (pos >= 1) and (pos <= dimL + 1);
+  if ok then begin
+    for i := dimL downto pos do v[i + 1] := v[i];
+    v[pos] := n;
+    dimL := dimL + 1;
+  end;
+end;
+
+procedure agregar(var v : vNombres; var dimL : integer;
+                  n : str20; var ok : boolean);
+begin
+  ok := (dimL < DIMF);
+  if ok then begin
+    dimL := dimL + 1;
+    v[dimL] := n;
+  end;
+end;` },
+    { ref: "P4·2 Ej 1", titulo: "¿Está n en el vector?",
+      enunciado: "(a) Módulo que reciba un vector de enteros (a lo sumo 500) y un valor n y devuelva si n está. (b) Lo mismo, con el vector ordenado de forma ascendente.",
+      pista: "En (b) podés cortar apenas encontrás un valor mayor o igual a n, sin llegar al final.",
+      sol: `{ a) desordenado }
+function esta(v : vNum; dimL, n : integer) : boolean;
+var i : integer;
+begin
+  i := 1;
+  while (i <= dimL) and (v[i] <> n) do i := i + 1;
+  esta := (i <= dimL);
+end;
+
+{ b) ordenado ascendente }
+function estaOrd(v : vNum; dimL, n : integer) : boolean;
+var i : integer;
+begin
+  i := 1;
+  while (i <= dimL) and (v[i] < n) do i := i + 1;
+  estaOrd := (i <= dimL) and (v[i] = n);
+end;` }
+  ]
+});
+
+TEMAS.push({
+  id: "punteros", num: "P5", titulo: "Punteros",
+  fuente: "Práctica 5",
+  resumen: "Memoria estática y dinámica, new y dispose, y cómo calcular cuánta memoria ocupa un programa.",
+  sim: "punteros",
+  teoria: [
+    { h: "Memoria estática y dinámica" },
+    { list: [
+      "<b>Estática</b>: la de las variables declaradas en <code>var</code>. Su tamaño se conoce al compilar y se reserva durante toda la ejecución (o del módulo, si son locales).",
+      "<b>Dinámica</b>: la que se pide y se libera mientras el programa corre, con <code>new</code> y <code>dispose</code>. Vive en el heap."
+    ] },
+    { h: "Variable puntero" },
+    { p: "Un puntero guarda una <b>dirección de memoria</b>. Siempre ocupa 4 bytes, sin importar a qué tipo apunte. Lo apuntado se accede con <code>^</code>." },
+    { code: `type
+  cadena = string[50];
+  pCadena = ^cadena;        { tipo puntero a cadena }
+var
+  p, q : pCadena;
+begin
+  new(p);                   { reserva 51 bytes en el heap }
+  p^ := 'hola';             { escribe en esa memoria }
+  q := p;                   { q apunta al MISMO lugar }
+  writeln(q^);              { hola }
+  dispose(p);               { libera los 51 bytes }
+  p := nil;                 { buena práctica }
+end.` },
+    { h: "Operaciones" },
+    { table: [
+      ["Operación", "Qué hace"],
+      ["<code>new(p)</code>", "Reserva en el heap el tamaño del tipo apuntado y guarda la dirección en p."],
+      ["<code>dispose(p)</code>", "Libera esa memoria. p sigue guardando la dirección, pero ya no es válida."],
+      ["<code>p := nil</code>", "p no apunta a nada. Es el valor que marca el fin de una lista."],
+      ["<code>p := q</code>", "Copia la dirección: los dos apuntan al mismo lugar."],
+      ["<code>p^ := q^</code>", "Copia el contenido de un lugar al otro."]
+    ] },
+    { h: "Tamaños (tabla de la cátedra)" },
+    { table: [
+      ["Tipo", "Bytes"],
+      ["integer", "2"], ["real", "4"], ["char", "1"], ["boolean", "1"],
+      ["string[n]", "n + 1"], ["puntero", "4"], ["record", "suma de sus campos"], ["array", "cantidad × tamaño del elemento"]
+    ] },
+    { tip: "<code>sizeof(p)</code> siempre da 4, porque mide el puntero. <code>sizeof(p^)</code> da el tamaño del tipo apuntado, aunque el string guarde menos caracteres." },
+    { h: "Errores clásicos" },
+    { list: [
+      "Usar <code>p^</code> antes de <code>new(p)</code>: p tiene basura y escribís en cualquier lado.",
+      "Usar <code>p^</code> después de <code>dispose(p)</code>: esa memoria ya no es tuya.",
+      "Hacer <code>new(p)</code> dos veces sin <code>dispose</code>: la primera memoria queda perdida, sin forma de liberarla.",
+      "Un puntero pasado <b>por valor</b> a un módulo: el módulo puede cambiar <code>p^</code> (el contenido se comparte) pero no a dónde apunta p."
+    ] }
+  ],
+  quiz: [
+    { q: "<code>cadena = string[50]</code>, <code>pc : ^cadena</code>. Después de <code>new(pc); pc^ := 'un nuevo nombre';</code>, ¿qué imprime <code>sizeof(pc^)</code>?", ops: ["4", "15", "16", "51"], ok: 3, exp: "sizeof mide el tipo, no el contenido: string[50] ocupa 50 + 1 = 51 bytes." },
+    { q: "¿Y <code>sizeof(pc)</code>?", ops: ["4", "51", "0", "Depende de si se hizo new"], ok: 0, exp: "Un puntero siempre ocupa 4 bytes." },
+    { q: "<code>producto = record codigo : integer; descripcion : string[9]; precio : real; end;</code> ¿Cuántos bytes ocupa?", ops: ["15", "16", "17", "14"], ok: 1, exp: "2 (integer) + 10 (string[9]) + 4 (real) = 16." },
+    { q: "¿Qué pasa con este código?", code: `new(pc);
+pc^ := 'Un texto';
+cambiarTexto(pc);   { procedure cambiarTexto(pun : puntero_cadena);
+                      begin pun^ := 'Otro texto'; end; }
+writeln(pc^);`, ops: ["Imprime Un texto", "Imprime Otro texto", "Error de compilación", "Imprime basura"], ok: 1, exp: "El puntero se copia, pero la copia apunta al mismo lugar. Modificar pun^ modifica lo que ve pc^." },
+    { q: "Ahora <code>cambiarTexto</code> hace <code>new(pun); pun^ := 'Otro texto';</code>. ¿Qué imprime <code>writeln(pc^)</code>?", ops: ["Un texto", "Otro texto", "Error", "Nada"], ok: 0, exp: "new le da a la copia una dirección nueva. pc sigue apuntando a 'Un texto', y la memoria pedida adentro queda perdida." },
+    { q: "Tenés 400.000 bytes libres. Hacés <code>Readln(alguien.apellido)</code> sobre una variable estática. ¿Cuánta memoria dinámica libre queda?", ops: ["400.000", "399.974", "399.928", "Depende del largo del apellido"], ok: 0, exp: "La variable estática ya estaba reservada. Leer en ella no pide memoria del heap." },
+    { q: "Con <code>TEmpleado</code> de 72 bytes, después de <code>New(PtrEmpleado)</code> y antes de <code>Dispose</code>, ¿cuánto queda libre de los 400.000?", ops: ["400.000", "399.996", "399.928", "399.924"], ok: 2, exp: "new reserva sizeof(TEmpleado) = 1 + 26 + 41 + 4 = 72 bytes. El puntero en sí es estático." },
+    { q: "¿Qué ocupa <code>array[1..2500] of ^string[50]</code> al iniciar el programa?", ops: ["127.500 bytes", "10.000 bytes", "0 bytes", "2.500 bytes"], ok: 1, exp: "Son 2500 punteros de 4 bytes. Los strings recién ocuparán memoria dinámica cuando hagas new de cada uno." }
+  ],
+  ejercicios: [
+    { ref: "P5 Ej 1", titulo: "sizeof con punteros a cadena",
+      enunciado: "Indicar qué imprime el programa: sizeof(pc) antes y después de new, sizeof(pc) y sizeof(pc^) después de asignar textos de distinto largo.",
+      pista: "sizeof nunca depende del contenido.",
+      sol: `4 bytes      { sizeof(pc) antes de new }
+4 bytes      { después de new }
+4 bytes      { después de asignar }
+51 bytes     { sizeof(pc^): string[50] = 51 }
+51 bytes     { con otro texto: sigue siendo 51 }` },
+    { ref: "P5 Ej 2", titulo: "sizeof con registros",
+      enunciado: "producto = record codigo : integer; descripcion : string[9]; precio : real; end. Indicar qué imprime cada sizeof.",
+      pista: "Calculá primero el tamaño del registro: es la suma de los campos.",
+      sol: `4 bytes      { sizeof(p) }
+16 bytes     { sizeof(prod) = 2 + 10 + 4 }
+4 bytes      { sizeof(p) después de new }
+16 bytes     { sizeof(p^) }
+16 bytes     { sizeof(p^) }
+16 bytes     { sizeof(prod) }` },
+    { ref: "P5 Ej 4", titulo: "¿Qué imprimen a, b, c y d?",
+      enunciado: "Cuatro programas con punteros a cadena: (a) asigna pc^ antes de new; (b) usa pc^ después de dispose; (c) cambia pun^ en un procedimiento; (d) hace new(pun) dentro del procedimiento.",
+      pista: "Pensá en qué dirección guarda el puntero en cada momento.",
+      sol: `{ a) Error: pc^ se usa antes de new. pc no apunta a memoria válida.
+  b) Imprime '51 bytes' y 'un nuevo nombre'. La última asignación
+     ocurre después de dispose: es un error (memoria ya liberada).
+  c) Imprime 'Un texto' y 'Otro texto'.
+     pun es una copia de pc pero apunta al mismo lugar.
+  d) Imprime 'Un texto' dos veces. new(pun) cambia solo la copia;
+     esa memoria nueva queda perdida al salir del procedimiento. }` },
+    { ref: "P5 Ej 5", titulo: "Memoria disponible en I a V",
+      enunciado: "TEmpleado = record sucursal : char; apellido : string[25]; correo : string[40]; sueldo : real; end. Con 400.000 bytes libres en (I), calcular la memoria disponible en cada punto.",
+      pista: "Solo new y dispose cambian la memoria dinámica disponible.",
+      sol: `{ sizeof(TEmpleado) = 1 + 26 + 41 + 4 = 72 bytes
+  (I)   400.000
+  (II)  400.000   leer en una variable estática no cambia nada
+  (III) 399.928   new reserva 72 bytes
+  (IV)  399.928   escribir en p^ no pide más memoria
+  (V)   400.000   dispose devuelve los 72 bytes }` },
+    { ref: "P5 Ej 7", titulo: "Vector de punteros a nombres",
+      enunciado: "2500 nombres de hasta 50 caracteres. (a) Tamaño de un vector estático. (b) Con un vector de punteros: tamaño inicial, módulo que reserve memoria para los 2500 y módulo que los lea.",
+      pista: "string[50] ocupa 51. Cada puntero, 4.",
+      sol: `{ a) array[1..2500] of string[50] = 2500 * 51 = 127.500 bytes (supera 64 KB)
+  b) i) 2500 * 4 = 10.000 bytes de memoria estática. }
+procedure reservar(var p : ArrPunteros);
+var i : integer;
+begin
+  for i := 1 to 2500 do new(p[i]);
+end;
+{ ii) Se reservan 2500 * 51 = 127.500 bytes de memoria dinámica. }
+procedure leerNombres(var p : ArrPunteros);
+var i : integer;
+begin
+  for i := 1 to 2500 do readln(p[i]^);
+end;` }
+  ]
+});
+
+TEMAS.push({
+  id: "listas", num: "P6", titulo: "Listas",
+  fuente: "Práctica 6",
+  resumen: "La estructura dinámica de la materia: crear nodos, recorrer, agregar adelante y atrás, insertar ordenado y eliminar.",
+  sim: "listas",
+  teoria: [
+    { h: "Declaración" },
+    { p: "Una lista es una secuencia de nodos en memoria dinámica. Cada nodo tiene un dato y un puntero al siguiente. Se accede solo desde el primero y se recorre en orden." },
+    { code: `type
+  lista = ^nodo;            { se declara antes que nodo: es la excepción }
+  nodo = record
+    dato : integer;
+    sig  : lista;
+  end;
+var
+  pri : lista;
+begin
+  pri := nil;               { lista vacía }
+end.` },
+    { h: "Recorrer" },
+    { code: `procedure imprimir(L : lista);
+begin
+  while (L <> nil) do begin
+    writeln(L^.dato);
+    L := L^.sig;
+  end;
+end;` },
+    { tip: "L se pasa por valor: el módulo avanza su copia y el pri del programa principal no se mueve." },
+    { h: "Agregar adelante" },
+    { p: "La forma más simple. Los elementos quedan en orden inverso al de lectura." },
+    { code: `procedure agregarAdelante(var L : lista; n : integer);
+var nue : lista;
+begin
+  new(nue);
+  nue^.dato := n;
+  nue^.sig := L;
+  L := nue;
+end;` },
+    { h: "Agregar atrás con puntero al último" },
+    { p: "Mantiene el orden de lectura. Sin <code>ult</code> habría que recorrer la lista entera en cada inserción." },
+    { code: `procedure agregarAtras(var pri, ult : lista; n : integer);
+var nue : lista;
+begin
+  new(nue);
+  nue^.dato := n;
+  nue^.sig := nil;
+  if (pri = nil) then pri := nue
+  else ult^.sig := nue;
+  ult := nue;
+end;` },
+    { h: "Insertar ordenado" },
+    { p: "Se avanza con dos punteros, <code>ant</code> y <code>act</code>, hasta encontrar dónde va el nuevo nodo. Hay que contemplar el caso en que va primero." },
+    { code: `procedure insertarOrdenado(var pri : lista; n : integer);
+var nue, ant, act : lista;
+begin
+  new(nue);
+  nue^.dato := n;
+  act := pri; ant := pri;
+  while (act <> nil) and (act^.dato < n) do begin
+    ant := act;
+    act := act^.sig;
+  end;
+  if (act = pri) then pri := nue        { va al principio }
+  else ant^.sig := nue;                 { va en el medio o al final }
+  nue^.sig := act;
+end;` },
+    { h: "Eliminar" },
+    { code: `procedure eliminar(var pri : lista; n : integer; var ok : boolean);
+var ant, act : lista;
+begin
+  act := pri; ant := pri;
+  while (act <> nil) and (act^.dato <> n) do begin
+    ant := act;
+    act := act^.sig;
+  end;
+  ok := (act <> nil);
+  if ok then begin
+    if (act = pri) then pri := act^.sig
+    else ant^.sig := act^.sig;
+    dispose(act);
+  end;
+end;` },
+    { h: "¿Vector o lista?" },
+    { table: [
+      ["", "Vector", "Lista"],
+      ["Tamaño", "Fijo (dimF), hay que conocer el máximo", "Crece y se achica en ejecución"],
+      ["Acceso", "Directo por posición: v[i]", "Secuencial desde pri"],
+      ["Insertar / eliminar", "Requiere corrimientos", "Se reacomodan punteros"],
+      ["Memoria", "Estática", "Dinámica (dato + 4 bytes por nodo)"]
+    ] }
+  ],
+  quiz: [
+    { q: "Con <code>armarNodo</code> agregando adelante, leés 10 21 13 48 0. ¿Cómo queda la lista?", ops: ["10 → 21 → 13 → 48", "48 → 13 → 21 → 10", "10 → 13 → 21 → 48", "0 → 48 → 13 → 21 → 10"], ok: 1, exp: "Cada número nuevo pasa a ser el primero. El 0 corta y no se agrega." },
+    { q: "En <code>agregarAdelante</code>, ¿por qué <code>L</code> tiene que ser <code>var</code>?", ops: ["Porque es un puntero", "Porque cambia a dónde apunta el primero", "No hace falta", "Para poder hacer new"], ok: 1, exp: "Después de agregar, pri tiene que apuntar al nodo nuevo. Si L va por valor, ese cambio se pierde." },
+    { q: "¿Qué falla en este fragmento?", code: `procedure agregarAdelante(var l : lista; p : persona);
+var aux : lista;
+begin
+  aux^.dato := p;
+  aux^.sig := l;
+  l := aux;
+end;`, ops: ["Falta new(aux)", "aux debería ser var", "Falta dispose", "l debería ser por valor"], ok: 0, exp: "aux tiene basura: hay que pedir memoria con new(aux) antes de usar aux^." },
+    { q: "En <code>insertarOrdenado</code>, terminaste el while con <code>act = pri</code>. ¿Qué significa?", ops: ["La lista estaba vacía o el nuevo va primero", "El nuevo va al final", "El valor ya existía", "Hay un error"], ok: 0, exp: "Nunca se avanzó: o no había nodos o el primero ya era mayor. Hay que actualizar pri." },
+    { q: "Al eliminar un nodo que no es el primero, ¿qué enganchás?", ops: ["pri := act^.sig", "ant^.sig := act^.sig", "act := ant", "ant := nil"], ok: 1, exp: "El anterior pasa a apuntar al siguiente del eliminado. Después se hace dispose(act)." },
+    { q: "La cantidad de datos es desconocida y hay que insertar ordenado muchas veces. ¿Qué estructura conviene?", ops: ["Vector", "Lista", "Registro", "Vector contador"], ok: 1, exp: "No hay un máximo conocido y la inserción en una lista no requiere corrimientos." },
+    { q: "Sublista entre A y B sobre una lista <b>ordenada ascendente</b>. ¿Cuándo podés dejar de recorrer?", ops: ["Nunca, hay que llegar a nil", "Cuando el dato es mayor o igual que B", "Cuando el dato es mayor que A", "Al primer elemento"], ok: 1, exp: "De ahí en adelante todos son ≥ B, así que ninguno entra en la sublista." }
+  ],
+  ejercicios: [
+    { ref: "P6 Ej 2", titulo: "Los 9 errores",
+      enunciado: "Un programa lee personas hasta el DNI 0 y las imprime en orden inverso. Encontrar los 9 errores.",
+      pista: "Revisá: pasaje de parámetros (var), new, el tipo de la variable p, el while de generarLista y los campos en imprimir.",
+      sol: `{ 1. leerPersona: p debe ser var.
+  2. agregarAdelante: l debe ser var.
+  3. agregarAdelante: falta new(aux).
+  4. generarLista: p debe ser persona, no nodo.
+  5. generarLista: falta leerPersona(p) dentro del while
+     (si no, el bucle es infinito).
+  6. Programa principal: falta l := nil antes de generarLista.
+  7. imprimirInformacion: l^.nombre debe ser l^.dato.nombre.
+  8. imprimirInformacion: l^.apellido debe ser l^.dato.apellido.
+  9. imprimirInformacion: l no debería ser var
+     (al recorrer se pierde el inicio de la lista). }` },
+    { ref: "P6 Ej 4", titulo: "Máximo, mínimo y múltiplos",
+      enunciado: "Usando la lista del ejercicio 1: módulos que devuelvan el máximo, el mínimo y la cantidad de elementos múltiplos de A.",
+      pista: "Tres funciones que recorren la lista por valor.",
+      sol: `function maximo(L : lista) : integer;
+var max : integer;
+begin
+  max := -32768;
+  while (L <> nil) do begin
+    if (L^.num > max) then max := L^.num;
+    L := L^.sig;
+  end;
+  maximo := max;
+end;
+
+function multiplos(L : lista; A : integer) : integer;
+var cant : integer;
+begin
+  cant := 0;
+  while (L <> nil) do begin
+    if (L^.num mod A = 0) then cant := cant + 1;
+    L := L^.sig;
+  end;
+  multiplos := cant;
+end;
+{ minimo es igual a maximo, con 32767 y '<'. }` },
+    { ref: "P6 Ej 9c", titulo: "Sublista entre A y B",
+      enunciado: "Recibir una lista L y dos valores A y B, y devolver una lista nueva con los elementos mayores que A y menores que B. (d) Si L está ordenada ascendente. (e) Si está ordenada descendente.",
+      pista: "Para conservar el orden en la nueva lista, agregá atrás con un puntero al último.",
+      sol: `procedure sublista(L : lista; A, B : integer; var nueva : lista);
+var ult, nue : lista;
+begin
+  nueva := nil; ult := nil;
+  while (L <> nil) do begin
+    if (L^.num > A) and (L^.num < B) then begin
+      new(nue); nue^.num := L^.num; nue^.sig := nil;
+      if (nueva = nil) then nueva := nue else ult^.sig := nue;
+      ult := nue;
+    end;
+    L := L^.sig;
+  end;
+end;
+{ d) Ascendente: while (L <> nil) and (L^.num < B) do ...
+     (saltear los <= A y cortar al llegar a B)
+  e) Descendente: saltear los >= B y cortar cuando L^.num <= A. }` },
+    { ref: "P6 Ej 10", titulo: "Lista de espera",
+      enunciado: "Cuando llega un cliente se registra su DNI y se le da el número siguiente. Se atiende por orden de llegada. Implementar RecibirCliente y AtenderCliente y simular la atención hasta el DNI 0.",
+      pista: "Es una cola: se agrega atrás (con puntero al último) y se atiende sacando el primero.",
+      sol: `type
+  cliente = record
+    dni : longint;
+    numero : integer;
+  end;
+  lista = ^nodo;
+  nodo = record
+    dato : cliente;
+    sig : lista;
+  end;
+
+procedure RecibirCliente(dni : longint; var pri, ult : lista;
+                         var ultNum : integer);
+var nue : lista;
+begin
+  ultNum := ultNum + 1;
+  new(nue);
+  nue^.dato.dni := dni;
+  nue^.dato.numero := ultNum;
+  nue^.sig := nil;
+  if (pri = nil) then pri := nue else ult^.sig := nue;
+  ult := nue;
+end;
+
+procedure AtenderCliente(var pri : lista; var c : cliente);
+var aux : lista;
+begin
+  c := pri^.dato;
+  aux := pri;
+  pri := pri^.sig;
+  dispose(aux);
+end;
+
+{ Programa: leer DNI hasta 0 llamando a RecibirCliente;
+  después, while (pri <> nil) do AtenderCliente(pri, c) e informar c. }` }
+  ]
+});
+
+TEMAS.push({
+  id: "repaso", num: "P7", titulo: "Repaso y estrategia",
+  fuente: "Práctica 7 y Consideraciones generales",
+  resumen: "Cómo leer un enunciado de parcial: si hay que almacenar, en qué estructura y en cuántos recorridos.",
+  sim: null,
+  teoria: [
+    { h: "1. ¿Hay que almacenar?" },
+    { p: "Solo si el enunciado lo pide. La pista suele ser \"lea y almacene\" o \"una vez leída y almacenada toda la información\". En ese caso, durante la carga no se calcula nada: primero se carga y después se recorre." },
+    { p: "Si no lo pide (\"lea números hasta -1 e informe…\"), se procesa mientras se lee y no se arma ninguna estructura." },
+    { h: "2. ¿Qué estructura?" },
+    { table: [
+      ["Situación del enunciado", "Estructura"],
+      ["Se conoce el máximo (\"a lo sumo 500\", \"los 100 camiones\")", "Vector con dimL"],
+      ["Cantidad desconocida (\"hasta DNI 0\")", "Lista"],
+      ["Contar por categoría de un rango chico (géneros 1..5, meses)", "Vector contador"],
+      ["Una tabla de valores fija (montos por póliza, precio por medio)", "Vector que se dispone (se carga con un módulo que no se implementa)"],
+      ["Los datos llegan ordenados por un campo", "Corte de control"],
+      ["Hay que generar una estructura ordenada", "Lista con insertar ordenado"]
+    ] },
+    { h: "3. ¿Cuántos recorridos?" },
+    { list: [
+      "Por defecto se prioriza la eficiencia: resolver todos los incisos en un único recorrido, con módulos chicos para cada parte (descomponer un número, evaluar una condición, actualizar un vector).",
+      "Si el enunciado dice \"realice un módulo que…\" para cada inciso, busca modularización de alto nivel: cada módulo recorre por su cuenta.",
+      "Un promedio general y \"cuántos superan el promedio\" siempre necesitan dos recorridos."
+    ] },
+    { h: "Módulos que vas a reusar en todos los parciales" },
+    { code: `{ Devuelve cuántos dígitos pares e impares tiene n }
+procedure paresImpares(n : longint; var pares, impares : integer);
+var dig : integer;
+begin
+  pares := 0; impares := 0;
+  repeat
+    dig := n mod 10;
+    if (dig mod 2 = 0) then pares := pares + 1
+    else impares := impares + 1;
+    n := n div 10;
+  until (n = 0);
+end;
+
+{ Actualiza los dos máximos con su código }
+procedure actualizarMax(valor, cod : integer;
+                        var max1, cod1, max2, cod2 : integer);
+begin
+  if (valor > max1) then begin
+    max2 := max1; cod2 := cod1;
+    max1 := valor; cod1 := cod;
+  end
+  else if (valor > max2) then begin
+    max2 := valor; cod2 := cod;
+  end;
+end;` },
+    { tip: "Los DNI no entran en un integer (máximo 32767). Usá <code>longint</code> para DNI, códigos largos y números de cuenta." }
+  ],
+  quiz: [
+    { q: "\"Lea números enteros hasta -1 e informe la cantidad de ocurrencias de cada dígito\". ¿Qué hay que almacenar?", ops: ["Todos los números en un vector", "Todos los números en una lista", "Solo un vector contador de dígitos", "Nada"], ok: 2, exp: "No se pide guardar los números. Se procesan al leerlos y solo se lleva el contador de 0..9." },
+    { q: "\"Lea y almacene la información de los clientes. La lectura finaliza con el código 1122\". ¿Qué estructura?", ops: ["Vector de 1122 posiciones", "Lista", "Vector contador", "Corte de control"], ok: 1, exp: "No se sabe cuántos clientes hay: lista." },
+    { q: "Hay 100 camiones con códigos 1..100 y viajes en cantidad desconocida que referencian al camión. ¿Cómo se organiza?", ops: ["Lista de camiones y lista de viajes", "Vector de 100 camiones (se dispone) y lista de viajes", "Vector de viajes", "Todo en un registro"], ok: 1, exp: "Los camiones son un conjunto fijo indexable por código: vector. Los viajes son una cantidad desconocida: lista." },
+    { q: "Se pide el promedio de todos los montos y cuántos clientes lo superan. ¿Cuántos recorridos como mínimo?", ops: ["1", "2", "3", "Depende de la estructura"], ok: 1, exp: "Necesitás el promedio terminado antes de poder comparar contra él." },
+    { q: "Durante la carga de un vector, ¿conviene ir contando las categorías para ahorrar un recorrido?", ops: ["Sí, siempre", "No, si el enunciado pide leer y almacenar primero", "Solo con listas", "Solo si hay corte de control"], ok: 1, exp: "Las consideraciones de la cátedra lo aclaran: cuando se pide almacenar, la carga solo carga." },
+    { q: "¿Qué tipo usás para guardar un DNI como 33555444?", ops: ["integer", "longint", "real", "char"], ok: 1, exp: "integer llega a 32767. longint llega a más de 2 mil millones." }
+  ],
+  ejercicios: [
+    { ref: "P7 Ej 1", titulo: "Casting de actores",
+      enunciado: "Leer y almacenar personas (DNI, apellido y nombre, edad, género 1..5) hasta el DNI 33555444, que se procesa. Informar: cuántas tienen más dígitos pares que impares en el DNI y los dos géneros más elegidos. Módulo que elimine un DNI (puede no existir).",
+      pista: "Cantidad desconocida → lista. Géneros → vector contador de 1..5. Los incisos a y b salen en un solo recorrido.",
+      sol: `program casting;
+type
+  str30 = string[30];
+  persona = record
+    dni : longint;
+    nombre : str30;
+    edad, genero : integer;
+  end;
+  lista = ^nodo;
+  nodo = record
+    dato : persona;
+    sig : lista;
+  end;
+  vGeneros = array [1..5] of integer;
+
+procedure leerPersona(var p : persona);
+begin
+  readln(p.dni); readln(p.nombre); readln(p.edad); readln(p.genero);
+end;
+
+procedure agregarAdelante(var L : lista; p : persona);
+var nue : lista;
+begin
+  new(nue); nue^.dato := p; nue^.sig := L; L := nue;
+end;
+
+procedure cargar(var L : lista);
+var p : persona;
+begin
+  repeat
+    leerPersona(p);
+    agregarAdelante(L, p);
+  until (p.dni = 33555444);
+end;
+
+function masParesQueImpares(dni : longint) : boolean;
+var pares, impares : integer;
+begin
+  pares := 0; impares := 0;
+  while (dni <> 0) do begin
+    if ((dni mod 10) mod 2 = 0) then pares := pares + 1
+    else impares := impares + 1;
+    dni := dni div 10;
+  end;
+  masParesQueImpares := (pares > impares);
+end;
+
+procedure procesar(L : lista);
+var
+  v : vGeneros;
+  i, cant, max1, max2, g1, g2 : integer;
+begin
+  for i := 1 to 5 do v[i] := 0;
+  cant := 0;
+  while (L <> nil) do begin
+    if masParesQueImpares(L^.dato.dni) then cant := cant + 1;
+    v[L^.dato.genero] := v[L^.dato.genero] + 1;
+    L := L^.sig;
+  end;
+  max1 := -1; max2 := -1; g1 := 0; g2 := 0;
+  for i := 1 to 5 do
+    if (v[i] > max1) then begin
+      max2 := max1; g2 := g1; max1 := v[i]; g1 := i;
+    end
+    else if (v[i] > max2) then begin
+      max2 := v[i]; g2 := i;
+    end;
+  writeln('DNI con más pares que impares: ', cant);
+  writeln('Géneros más elegidos: ', g1, ' y ', g2);
+end;
+
+procedure eliminar(var L : lista; dni : longint);
+var ant, act : lista;
+begin
+  act := L; ant := L;
+  while (act <> nil) and (act^.dato.dni <> dni) do begin
+    ant := act; act := act^.sig;
+  end;
+  if (act <> nil) then begin
+    if (act = L) then L := act^.sig else ant^.sig := act^.sig;
+    dispose(act);
+  end;
+end;
+
+var
+  L : lista;
+  dni : longint;
+begin
+  L := nil;
+  cargar(L);
+  procesar(L);
+  readln(dni);
+  eliminar(L, dni);
+end.` },
+    { ref: "P7 Ej 12", titulo: "Fortaco's",
+      enunciado: "Hay una tabla con el costo mensual de 4 suscripciones. Leer y almacenar clientes (nombre, DNI, edad, tipo 1..4) hasta el DNI 0 (no se procesa). Informar la ganancia total y las 2 suscripciones con más clientes.",
+      pista: "La tabla de costos se dispone: declarala como vector de 1..4 e invocá un módulo que la cargue (sin implementarlo). Clientes → lista. Un recorrido con un vector contador.",
+      sol: `type
+  vCostos = array [1..4] of real;
+  vCant = array [1..4] of integer;
+  cliente = record
+    nombre : string[30];
+    dni : longint;
+    edad, tipo : integer;
+  end;
+  lista = ^nodo;
+  nodo = record
+    dato : cliente;
+    sig : lista;
+  end;
+
+procedure procesar(L : lista; costos : vCostos);
+var
+  cant : vCant;
+  i, max1, max2, t1, t2 : integer;
+  total : real;
+begin
+  for i := 1 to 4 do cant[i] := 0;
+  total := 0;
+  while (L <> nil) do begin
+    total := total + costos[L^.dato.tipo];
+    cant[L^.dato.tipo] := cant[L^.dato.tipo] + 1;
+    L := L^.sig;
+  end;
+  max1 := -1; max2 := -1; t1 := 0; t2 := 0;
+  for i := 1 to 4 do
+    if (cant[i] > max1) then begin
+      max2 := max1; t2 := t1; max1 := cant[i]; t1 := i;
+    end
+    else if (cant[i] > max2) then begin
+      max2 := cant[i]; t2 := i;
+    end;
+  writeln('Ganancia total: $', total:0:2);
+  writeln('Suscripciones con más clientes: ', t1, ' y ', t2);
+end;
+{ Programa principal:
+    cargarCostos(costos);   se dispone, no se implementa
+    cargarClientes(L);      lectura previa + while (dni <> 0)
+    procesar(L, costos); }` },
+    { ref: "P7 Ej 3", titulo: "Remisería",
+      enunciado: "Se dispone de los viajes de mayo (número, código de auto, origen, destino, km), ordenados por código de auto. (a) Los dos autos con más km. (b) Generar una lista nueva con los viajes de más de 5 km, ordenada por número de viaje.",
+      pista: "La estructura se dispone y viene ordenada por auto: corte de control sobre la lista. Para (b), insertar ordenado por número en la lista nueva, dentro del mismo recorrido.",
+      sol: `procedure procesar(L : lista; var nueva : lista);
+var
+  actual, cod1, cod2 : integer;
+  km, max1, max2 : real;
+begin
+  nueva := nil;
+  max1 := -1; max2 := -1; cod1 := 0; cod2 := 0;
+  while (L <> nil) do begin
+    actual := L^.dato.codAuto;
+    km := 0;
+    while (L <> nil) and (L^.dato.codAuto = actual) do begin
+      km := km + L^.dato.km;
+      if (L^.dato.km > 5) then
+        insertarOrdenado(nueva, L^.dato);   { por número de viaje }
+      L := L^.sig;
+    end;
+    if (km > max1) then begin
+      max2 := max1; cod2 := cod1; max1 := km; cod1 := actual;
+    end
+    else if (km > max2) then begin
+      max2 := km; cod2 := actual;
+    end;
+  end;
+  writeln('Autos con más km: ', cod1, ' y ', cod2);
+end;
+{ En el corte de control sobre una lista, el while interno
+  también pregunta (L <> nil): el último grupo termina en nil. }` }
+  ]
+});
+/* ====== utilidades ====== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const reduced = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const KW = new Set(("program procedure function begin end var const type record array of if then else while do repeat until for to downto case " +
+  "and or not div mod nil new dispose integer real char boolean string longint true false read readln write writeln sizeof").split(" "));
+
+function highlightLines(code) {
+  const re = /(\{[^}]*\}|\(\*[\s\S]*?\*\))|('(?:[^']|'')*')|(\b\d+(?:\.\d+)?(?:e[+-]?\d+)?\b)|([A-Za-z_][A-Za-z0-9_]*)|([\s\S])/gi;
+  let html = "", m;
+  const wrap = (cls, txt) => txt.split("\n").map(p => p ? `<span class="${cls}">${esc(p)}</span>` : "").join("\n");
+  while ((m = re.exec(code))) {
+    if (m[1]) html += wrap("c", m[1]);
+    else if (m[2]) html += wrap("s", m[2]);
+    else if (m[3]) html += wrap("nu", m[3]);
+    else if (m[4]) html += KW.has(m[4].toLowerCase()) ? wrap("k", m[4]) : esc(m[4]);
+    else html += esc(m[5]);
+  }
+  return html.split("\n");
+}
+
+const COPY = [];
+function ide(code, opts = {}) {
+  const lines = highlightLines(code);
+  const id = COPY.push(code) - 1;
+  const nums = opts.numbers;
+  const body = lines.map((l, i) => `<span class="ln"${nums ? ` data-n="${i + 1}"` : ""}>${l || " "}</span>`).join("");
+  return `<div class="ide"${opts.id ? ` id="${opts.id}"` : ""}><div class="bar"><b>${esc(opts.title || "pascal")}</b>${opts.copy === false ? "" : `<button type="button" data-copy="${id}">Copiar</button>`}</div><pre>${body}</pre></div>`;
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-copy]");
+  if (!b) return;
+  const txt = COPY[+b.dataset.copy];
+  const done = () => toast("Código copiado");
+  try {
+    navigator.clipboard.writeText(txt).then(done, () => selectCode(b));
+  } catch (_) { selectCode(b); }
+});
+function selectCode(b) {
+  const pre = b.closest(".ide").querySelector("pre");
+  const r = document.createRange(); r.selectNodeContents(pre);
+  const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+  toast("Código seleccionado: copialo con Ctrl/Cmd + C");
+}
+let toastT;
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 2200);
+}
+
+/* ====== progreso ====== */
+const KEY = "cadp-progreso-v1";
+let P = { t: {}, last: null, mix: 0 };
+try { const raw = localStorage.getItem(KEY); if (raw) P = Object.assign(P, JSON.parse(raw)); } catch (_) {}
+const tp = id => (P.t[id] ||= { teoria: false, best: 0, tries: 0, ej: {} });
+
+function temaPct(t) {
+  const s = tp(t.id);
+  const ejDone = t.ejercicios.filter((_, i) => s.ej[i]).length;
+  return Math.round(((s.teoria ? 1 : 0) + s.best / t.quiz.length + ejDone / t.ejercicios.length) / 3 * 100);
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(P)); } catch (_) {}
+  scheduleSync();
+  updateGlobal();
+}
+function merge(o) {
+  if (!o || !o.t) return;
+  for (const [id, s] of Object.entries(o.t)) {
+    const m = tp(id);
+    m.teoria = m.teoria || !!s.teoria;
+    m.best = Math.max(m.best, s.best || 0);
+    m.tries = Math.max(m.tries, s.tries || 0);
+    for (const k of Object.keys(s.ej || {})) if (s.ej[k]) m.ej[k] = true;
+  }
+  P.mix = Math.max(P.mix || 0, o.mix || 0);
+  if (!P.last && o.last) P.last = o.last;
+}
+
+/* sincronización opcional entre dispositivos */
+let db = null, uid = null, syncT = null, writing = false, again = false;
+function setSync(t) { const el = $("#sync"); if (el) el.textContent = t; }
+function scheduleSync() {
+  if (!db) return;
+  clearTimeout(syncT);
+  syncT = setTimeout(pushSync, 1500);
+}
+async function pushSync() {
+  if (!db) return;
+  if (writing) { again = true; return; }
+  writing = true;
+  try {
+    await db.doc("data/users/" + uid + "/progreso").set({ estado: JSON.stringify(P), actualizado: Date.now() });
+    setSync("Guardado en tu cuenta");
+  } catch (_) { setSync("Guardado en este navegador"); }
+  writing = false;
+  if (again) { again = false; pushSync(); }
+}
+(async () => {
+  try {
+    if (!window.claude || !window.claude.use) return;
+    const user = await window.claude.use("user");
+    if (!user) return;
+    uid = await user.id();
+    if (!uid) return;
+    const d = await window.claude.use("db");
+    if (!d) return;
+    const snap = await d.doc("data/users/" + uid + "/progreso").get();
+    db = d;
+    if (snap.exists) {
+      const data = snap.data();
+      try { merge(JSON.parse(data.estado)); } catch (_) {}
+      try { localStorage.setItem(KEY, JSON.stringify(P)); } catch (_) {}
+      renderNav(); route(true);
+    }
+    setSync("Guardado en tu cuenta");
+    scheduleSync();
+  } catch (_) {}
+})();
+
+function updateGlobal() {
+  const pct = Math.round(TEMAS.reduce((a, t) => a + temaPct(t), 0) / TEMAS.length);
+  $("#gtext").textContent = pct + "% completado";
+  $("#gmeter").style.width = pct + "%";
+  TEMAS.forEach(t => { const b = $(`#nav-${t.id} .p i`); if (b) b.style.width = temaPct(t) + "%"; });
+}
+
+/* ====== navegación ====== */
+function renderNav() {
+  $("#side").innerHTML = `<div class="lbl">Prácticas</div>` + TEMAS.map(t =>
+    `<button class="nav" id="nav-${t.id}" data-go="${t.id}" type="button"><span class="n">${t.num}</span><span class="t">${esc(t.titulo)}</span><span class="p"><i style="width:${temaPct(t)}%"></i></span></button>`).join("");
+  updateGlobal();
+}
+document.addEventListener("click", e => {
+  const g = e.target.closest("[data-go]");
+  if (!g) return;
+  location.hash = g.dataset.go;
+});
+$("#home-link").addEventListener("click", () => { location.hash = "inicio"; });
+
+const TABS = [["teoria", "Teoría"], ["quiz", "Quiz"], ["ej", "Ejercicios"], ["sim", "Simulador"]];
+let current = { tema: null, tab: null };
+function route(keepScroll) {
+  const h = (location.hash || "").slice(1);
+  const [id, tab] = h.split("-");
+  const t = TEMAS.find(x => x.id === id);
+  stopPlayers();
+  if (h === "mezcla") { current = { tema: null, tab: "mix" }; renderMix(); }
+  else if (!t) { current = { tema: null, tab: null }; renderHome(); }
+  else {
+    const valid = TABS.map(x => x[0]).filter(k => k !== "sim" || t.sim);
+    current = { tema: t, tab: valid.includes(tab) ? tab : "teoria" };
+    P.last = t.id; try { localStorage.setItem(KEY, JSON.stringify(P)); } catch (_) {}
+    renderTema();
+  }
+  $$(".nav").forEach(n => n.setAttribute("aria-current", String(!!current.tema && n.dataset.go === current.tema.id)));
+  const an = $(".nav[aria-current='true']"), sd = $("#side");
+  if (an && sd.scrollWidth > sd.clientWidth) sd.scrollLeft = an.offsetLeft - 16;
+  const at = $('.tab[aria-selected="true"]'), tb = $(".tabs");
+  if (at && tb && tb.scrollWidth > tb.clientWidth) tb.scrollLeft = at.offsetLeft - 16;
+  if (!keepScroll) window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", () => route());
+
+/* ====== inicio ====== */
+function statusPill(pct) {
+  if (pct >= 100) return `<span class="pill ok">Completo</span>`;
+  if (pct > 0) return `<span class="pill mid">${pct}%</span>`;
+  return `<span class="pill">Sin empezar</span>`;
+}
+function renderHome() {
+  const last = TEMAS.find(t => t.id === P.last);
+  const total = TEMAS.reduce((a, t) => a + t.quiz.length, 0);
+  $("#main").innerHTML = `
+  <section class="hero">
+    <div class="eyebrow">Analista Programador Universitario · 1er año · Facultad de Informática</div>
+    <h1>Toda CADP, práctica por práctica</h1>
+    <p>Teoría resumida, preguntas para autoevaluarte, los ejercicios de las prácticas 2026 con pista y solución, y simuladores para ver qué pasa en memoria con vectores, punteros y listas.</p>
+  </section>
+  <div class="intro">
+    <div class="panel">
+      <h3>Cómo usar cada tema</h3>
+      <ol>
+        <li>Leé la teoría y marcala como leída.</li>
+        <li>Hacé el quiz. Las respuestas explican el porqué.</li>
+        <li>Resolvé los ejercicios en papel antes de abrir la solución.</li>
+        <li>Si algo no cierra, pasalo por el simulador paso a paso.</li>
+      </ol>
+    </div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:12px">
+      <h3>Seguir estudiando</h3>
+      ${last ? `<button class="btn pri" data-go="${last.id}" type="button">Volver a ${esc(last.titulo)}</button>` : `<button class="btn pri" data-go="control" type="button">Empezar por Estructuras de control</button>`}
+      <button class="btn" data-go="mezcla" type="button">Quiz mezclado: 10 preguntas al azar</button>
+      <div class="stats"><span>Mejor quiz mezclado: <b>${P.mix || 0}/10</b></span><span>Preguntas en total: <b>${total}</b></span></div>
+    </div>
+  </div>
+  <h2 class="section-h">Prácticas</h2>
+  <div class="grid">${TEMAS.map(t => {
+    const s = tp(t.id), pct = temaPct(t);
+    const ejDone = t.ejercicios.filter((_, i) => s.ej[i]).length;
+    return `<button class="card" data-go="${t.id}" type="button">
+      <div class="ch"><span class="ref">${t.num}</span>${statusPill(pct)}</div>
+      <h3>${esc(t.titulo)}</h3>
+      <p>${esc(t.resumen)}</p>
+      <div class="stats"><span>Teoría <b>${s.teoria ? "leída" : "pendiente"}</b></span><span>Quiz <b>${s.best}/${t.quiz.length}</b></span><span>Ejercicios <b>${ejDone}/${t.ejercicios.length}</b></span></div>
+      <div class="meter" style="width:100%"><i style="width:${pct}%;background:var(--ok)"></i></div>
+    </button>`;
+  }).join("")}</div>`;
+}
+
+/* ====== tema ====== */
+function renderTema() {
+  const t = current.tema, s = tp(t.id);
+  const ejDone = t.ejercicios.filter((_, i) => s.ej[i]).length;
+  const badge = {
+    teoria: s.teoria ? `<span class="badge done">leída</span>` : "",
+    quiz: `<span class="badge${s.best === t.quiz.length ? " done" : ""}">${s.best}/${t.quiz.length}</span>`,
+    ej: `<span class="badge${ejDone === t.ejercicios.length ? " done" : ""}">${ejDone}/${t.ejercicios.length}</span>`,
+    sim: ""
+  };
+  $("#main").innerHTML = `
+  <section class="hero">
+    <div class="eyebrow">${t.num} · ${esc(t.fuente)}</div>
+    <h1>${esc(t.titulo)}</h1>
+    <p>${esc(t.resumen)}</p>
+  </section>
+  <div class="tabs" role="tablist">${TABS.filter(([k]) => k !== "sim" || t.sim).map(([k, l]) =>
+    `<button class="tab" role="tab" type="button" aria-selected="${current.tab === k}" data-tab="${k}">${l}${badge[k]}</button>`).join("")}</div>
+  <div id="pane"></div>`;
+  $$(".tab").forEach(b => b.addEventListener("click", () => {
+    location.hash = t.id + (b.dataset.tab === "teoria" ? "" : "-" + b.dataset.tab);
+  }));
+  const pane = $("#pane");
+  if (current.tab === "teoria") renderTeoria(t, pane);
+  else if (current.tab === "quiz") renderQuiz(t.quiz, pane, (ok) => {
+    s.tries++; if (ok > s.best) s.best = ok; save(); refreshBadges();
+  });
+  else if (current.tab === "ej") renderEj(t, pane);
+  else renderSim(t, pane);
+}
+function refreshBadges() {
+  const t = current.tema; if (!t) return;
+  const s = tp(t.id);
+  const ejDone = t.ejercicios.filter((_, i) => s.ej[i]).length;
+  const q = $('.tab[data-tab="quiz"] .badge'); if (q) { q.textContent = s.best + "/" + t.quiz.length; q.classList.toggle("done", s.best === t.quiz.length); }
+  const e = $('.tab[data-tab="ej"] .badge'); if (e) { e.textContent = ejDone + "/" + t.ejercicios.length; e.classList.toggle("done", ejDone === t.ejercicios.length); }
+  const tb = $('.tab[data-tab="teoria"]');
+  if (tb) { let b = tb.querySelector(".badge"); if (s.teoria && !b) tb.insertAdjacentHTML("beforeend", `<span class="badge done">leída</span>`); if (!s.teoria && b) b.remove(); }
+}
+
+function renderTeoria(t, pane) {
+  const s = tp(t.id);
+  const html = t.teoria.map(b => {
+    if (b.h) return `<h2>${esc(b.h)}</h2>`;
+    if (b.p) return `<p>${b.p}</p>`;
+    if (b.code) return ide(b.code);
+    if (b.tip) return `<div class="tip">${b.tip}</div>`;
+    if (b.list) return `<ul>${b.list.map(x => `<li>${x}</li>`).join("")}</ul>`;
+    if (b.table) return `<div class="tbl"><table><thead><tr>${b.table[0].map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>${b.table.slice(1).map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+    return "";
+  }).join("");
+  pane.innerHTML = `<article class="prose">${html}
+    <div class="row" style="margin-top:12px">
+      <button class="btn ${s.teoria ? "ok" : "pri"}" id="mark" type="button">${s.teoria ? "Teoría leída ✓" : "Marcar teoría como leída"}</button>
+      <button class="btn" type="button" data-go="${t.id}-quiz">Ir al quiz</button>
+    </div></article>`;
+  $("#mark").addEventListener("click", () => {
+    s.teoria = !s.teoria; save(); refreshBadges();
+    const b = $("#mark"); b.className = "btn " + (s.teoria ? "ok" : "pri"); b.textContent = s.teoria ? "Teoría leída ✓" : "Marcar teoría como leída";
+    if (s.teoria) toast("Teoría marcada como leída");
+  });
+}
+
+function renderQuiz(qs, pane, onFinish) {
+  const ans = new Array(qs.length).fill(null);
+  const L = "ABCD";
+  pane.innerHTML = `<div class="qlist">${qs.map((q, i) => `
+    <div class="q" id="q${i}">
+      <div class="qh"><span class="qn">${String(i + 1).padStart(2, "0")}</span><div class="qt">${q.q}${q.tema ? ` <span class="ref">${q.tema}</span>` : ""}</div></div>
+      ${q.code ? ide(q.code, { copy: false }) : ""}
+      <div class="opts">${q.ops.map((o, j) => `<button class="opt" type="button" data-q="${i}" data-o="${j}"><span class="l">${L[j]}</span><span>${o}</span></button>`).join("")}</div>
+      <div class="exp" hidden></div>
+    </div>`).join("")}
+    <div class="score" id="score"><div class="big" id="sc">0/${qs.length}</div><div id="sct">Respondé todas las preguntas para ver tu resultado.</div><button class="btn" id="retry" type="button" style="margin-left:auto">Reiniciar quiz</button></div>
+  </div>`;
+  pane.querySelectorAll(".opt").forEach(b => b.addEventListener("click", () => {
+    const i = +b.dataset.q, j = +b.dataset.o;
+    if (ans[i] !== null) return;
+    ans[i] = j;
+    const q = qs[i], box = $("#q" + i);
+    box.querySelectorAll(".opt").forEach((x, k) => {
+      x.disabled = true;
+      if (k === q.ok) x.classList.add("right");
+      else if (k === j) x.classList.add("wrong");
+    });
+    const ex = box.querySelector(".exp");
+    ex.hidden = false;
+    ex.className = "exp" + (j === q.ok ? "" : " no");
+    ex.innerHTML = `<b>${j === q.ok ? "Correcto." : "No es esa."}</b> ${q.exp}`;
+    const ok = ans.filter((a, k) => a === qs[k].ok).length;
+    const n = ans.filter(a => a !== null).length;
+    $("#sc").textContent = ok + "/" + qs.length;
+    if (n === qs.length) {
+      $("#sct").textContent = ok === qs.length ? "Perfecto. Este tema está dominado." : ok >= qs.length * 0.7 ? "Bien. Repasá las que fallaste." : "Conviene volver a la teoría y reintentar.";
+      onFinish(ok, qs.length);
+    } else $("#sct").textContent = `Respondiste ${n} de ${qs.length}.`;
+  }));
+  $("#retry").addEventListener("click", () => { renderQuiz(qs, pane, onFinish); pane.scrollIntoView({ behavior: reduced ? "auto" : "smooth" }); });
+}
+
+function renderMix() {
+  const all = [];
+  TEMAS.forEach(t => t.quiz.forEach(q => all.push(Object.assign({ tema: t.num }, q))));
+  for (let i = all.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [all[i], all[j]] = [all[j], all[i]]; }
+  const qs = all.slice(0, 10);
+  $("#main").innerHTML = `<section class="hero"><div class="eyebrow">Todas las prácticas</div><h1>Quiz mezclado</h1><p>Diez preguntas al azar de todos los temas, como para medir cómo llegás al parcial. Cada vez que entrás salen otras.</p></section><div id="pane"></div>
+    <div class="row" style="margin-top:16px"><button class="btn" type="button" id="otra">Otras 10 preguntas</button><button class="btn" type="button" data-go="inicio">Volver al inicio</button></div>`;
+  renderQuiz(qs, $("#pane"), ok => { if (ok > (P.mix || 0)) { P.mix = ok; save(); } });
+  $("#otra").addEventListener("click", () => { renderMix(); window.scrollTo(0, 0); });
+}
+
+function renderEj(t, pane) {
+  const s = tp(t.id);
+  pane.innerHTML = `<div class="elist">${t.ejercicios.map((e, i) => `
+    <article class="ex${s.ej[i] ? " done" : ""}" id="ex${i}">
+      <div class="eh"><span class="ref">${e.ref}</span><h3>${esc(e.titulo)}</h3>
+        <label class="chk"><input type="checkbox" id="chk-${t.id}-${i}" data-i="${i}"${s.ej[i] ? " checked" : ""}> Lo resolví</label></div>
+      <p>${esc(e.enunciado)}</p>
+      <details><summary>Ver pista</summary><div class="pista">${esc(e.pista)}</div></details>
+      <details><summary>Ver solución</summary>${ide(e.sol, { title: "solución" })}</details>
+    </article>`).join("")}</div>`;
+  pane.querySelectorAll(".chk input").forEach(c => c.addEventListener("change", () => {
+    const i = +c.dataset.i;
+    if (c.checked) s.ej[i] = true; else delete s.ej[i];
+    $("#ex" + i).classList.toggle("done", c.checked);
+    save(); refreshBadges();
+  }));
+}
+/* ====== reproductor paso a paso (compartido por los simuladores) ====== */
+const PLAYERS = [];
+function stopPlayers() { PLAYERS.forEach(p => p.pause()); PLAYERS.length = 0; }
+
+class Player {
+  constructor(root, draw) {
+    this.root = root; this.draw = draw; this.frames = []; this.i = 0; this.timer = null; this.speed = 900;
+    root.innerHTML = `
+      <div class="player">
+        <button class="btn" type="button" data-a="first" aria-label="Volver al principio">⏮</button>
+        <button class="btn" type="button" data-a="prev" aria-label="Paso anterior">◀ Anterior</button>
+        <button class="btn pri" type="button" data-a="play">▶ Reproducir</button>
+        <button class="btn" type="button" data-a="next" aria-label="Paso siguiente">Siguiente ▶</button>
+        <label class="field"><span class="sr">Velocidad</span><select data-a="speed" id="spd-${PLAYERS.length}"><option value="1500">Lenta</option><option value="900" selected>Normal</option><option value="400">Rápida</option></select></label>
+        <span class="pos"></span>
+      </div>`;
+    root.querySelector('[data-a="first"]').onclick = () => { this.pause(); this.show(0); };
+    root.querySelector('[data-a="prev"]').onclick = () => { this.pause(); this.show(this.i - 1); };
+    root.querySelector('[data-a="next"]').onclick = () => { this.pause(); this.show(this.i + 1); };
+    root.querySelector('[data-a="play"]').onclick = () => this.timer ? this.pause() : this.play();
+    root.querySelector('[data-a="speed"]').onchange = e => { this.speed = +e.target.value; if (this.timer) { this.pause(); this.play(); } };
+    PLAYERS.push(this);
+  }
+  load(frames, autoplay) {
+    this.pause(); this.frames = frames; this.show(0);
+    if (autoplay && !reduced) this.play();
+  }
+  show(i) {
+    if (!this.frames.length) return;
+    this.i = Math.max(0, Math.min(this.frames.length - 1, i));
+    this.draw(this.frames[this.i], this.i, this.frames.length);
+    this.root.querySelector(".pos").textContent = `paso ${this.i + 1} de ${this.frames.length}`;
+    if (this.i === this.frames.length - 1) this.pause();
+  }
+  play() {
+    if (this.i >= this.frames.length - 1) this.show(0);
+    this.root.querySelector('[data-a="play"]').textContent = "❚❚ Pausa";
+    this.timer = setInterval(() => this.show(this.i + 1), this.speed);
+  }
+  pause() {
+    clearInterval(this.timer); this.timer = null;
+    const b = this.root.querySelector('[data-a="play"]'); if (b) b.textContent = "▶ Reproducir";
+  }
+}
+function setCodeLine(box, line) {
+  box.querySelectorAll(".ln").forEach((l, k) => l.classList.toggle("cur", k + 1 === line));
+  const cur = box.querySelector(".ln.cur");
+  if (cur) { const pre = cur.closest("pre"); const top = cur.offsetTop - pre.clientHeight / 2; pre.scrollTop = Math.max(0, top); }
+}
+function setMsg(el, frame) {
+  el.className = "msg" + (frame.kind === "err" ? " err" : frame.kind === "ok" ? " okm" : "");
+  el.innerHTML = frame.msg || "";
+}
+
+function renderSim(t, pane) {
+  if (t.sim === "vector") return simVector(pane);
+  if (t.sim === "punteros") return simPunteros(pane);
+  if (t.sim === "listas") return simListas(pane);
+  return simTraza(pane, TRAZAS[t.sim]);
+}
+
+/* ====== simulador de pruebas de escritorio ====== */
+function tracer(tokens) {
+  const frames = []; let out = "", pos = -1, prev = {};
+  return {
+    frames,
+    read() { pos++; return tokens[pos]; },
+    print(s) { out += s; },
+    step(line, msg, fr, kind) {
+      const flat = {};
+      fr.forEach(f => Object.entries(f.vars).forEach(([k, v]) => flat[f.name + "." + k] = String(v)));
+      const ch = Object.keys(flat).filter(k => prev[k] !== flat[k] && prev[k] !== undefined);
+      prev = flat;
+      frames.push({ line, msg, kind, fr: JSON.parse(JSON.stringify(fr)), ch, out, pos, tokens });
+    }
+  };
+}
+const nums = s => (s.match(/-?\d+/g) || []).map(Number);
+
+const TRAZAS = {
+  traza: [
+    { id: "min", nombre: "Dos mínimos", label: "Números a leer", def: "8 3 12 1 5",
+      code: n => `program dosMinimos;
+var i, num, min1, min2 : integer;
+begin
+  min1 := 32767; min2 := 32767;
+  for i := 1 to ${n} do begin
+    read(num);
+    if (num < min1) then begin
+      min2 := min1;
+      min1 := num;
+    end
+    else if (num < min2) then
+      min2 := num;
+  end;
+  writeln(min1, ' ', min2);
+end.`,
+      prep: s => { const a = nums(s).slice(0, 8); return a.length ? a : [8, 3, 12, 1, 5]; },
+      gen(a) {
+        const T = tracer(a); const V = { i: "?", num: "?", min1: "?", min2: "?" };
+        const F = () => [{ name: "Programa principal", vars: V }];
+        T.step(2, "Se declaran las variables. Todavía no tienen valor: contienen basura.", F());
+        V.min1 = 32767; V.min2 = 32767;
+        T.step(4, "Ambos mínimos arrancan en 32767, el mayor integer. Así cualquier número leído es menor.", F());
+        for (let i = 1; i <= a.length; i++) {
+          V.i = i; T.step(5, `Vuelta ${i} del for.`, F());
+          V.num = T.read(); T.step(6, `Se lee ${V.num}.`, F());
+          if (V.num < V.min1) {
+            T.step(7, `${V.num} < ${V.min1}: es el nuevo mínimo.`, F());
+            V.min2 = V.min1; T.step(8, "El mínimo anterior pasa a ser el segundo.", F());
+            V.min1 = V.num; T.step(9, "Se guarda el nuevo mínimo.", F());
+          } else {
+            T.step(7, `${V.num} no es menor que ${V.min1}.`, F());
+            if (V.num < V.min2) { T.step(11, `Pero ${V.num} < ${V.min2}: es el nuevo segundo mínimo.`, F()); V.min2 = V.num; T.step(12, "Se actualiza min2.", F()); }
+            else T.step(11, `Tampoco es menor que ${V.min2}: no cambia nada.`, F());
+          }
+        }
+        T.print(V.min1 + " " + V.min2);
+        T.step(14, `Fin del for. Se informan los dos mínimos.`, F(), "ok");
+        return T.frames;
+      } },
+    { id: "dig", nombre: "Contar dígitos pares", label: "Número (hasta 32767)", def: "2504",
+      code: () => `program contarPares;
+var num, dig, cant : integer;
+begin
+  read(num);
+  cant := 0;
+  while (num <> 0) do begin
+    dig := num mod 10;
+    if (dig mod 2 = 0) then
+      cant := cant + 1;
+    num := num div 10;
+  end;
+  writeln(cant);
+end.`,
+      prep: s => { const a = nums(s); const n = a.length ? Math.abs(a[0]) : 2504; return [Math.min(n, 32767)]; },
+      gen(a) {
+        const T = tracer(a); const V = { num: "?", dig: "?", cant: "?" };
+        const F = () => [{ name: "Programa principal", vars: V }];
+        V.num = T.read(); T.step(4, `Se lee ${V.num}.`, F());
+        V.cant = 0; T.step(5, "El contador empieza en 0.", F());
+        while (V.num !== 0) {
+          T.step(6, `${V.num} <> 0: entra al while.`, F());
+          V.dig = V.num % 10; T.step(7, `${V.num} mod 10 = ${V.dig}: es el último dígito.`, F());
+          if (V.dig % 2 === 0) { T.step(8, `${V.dig} es par.`, F()); V.cant++; T.step(9, "Se cuenta.", F()); }
+          else T.step(8, `${V.dig} es impar: no se cuenta.`, F());
+          const old = V.num; V.num = Math.trunc(V.num / 10); T.step(10, `${old} div 10 = ${V.num}: se descarta el último dígito.`, F());
+        }
+        T.step(6, "num vale 0: termina el while.", F());
+        T.print(String(V.cant)); T.step(12, `Hay ${V.cant} dígitos pares.`, F(), "ok");
+        return T.frames;
+      } }
+  ],
+  parametros: [
+    { id: "ref", nombre: "suma con var num2", label: "Valor inicial de x", def: "10", ref: true },
+    { id: "val", nombre: "suma con num2 por valor", label: "Valor inicial de x", def: "10", ref: false },
+    { id: "dpi", nombre: "digParesImpares", label: "Secuencia (termina en 100)", def: "250 35 100",
+      code: () => `procedure digParesImpares(num : integer; var par, impar : integer);
+var dig : integer;
+begin
+  while (num <> 0) do begin
+    dig := num mod 10;
+    if ((dig mod 2) = 0) then
+      par := par + 1
+    else
+      impar := impar + 1;
+    num := num DIV 10;
+  end;
+end;
+var dato, par, impar : integer;
+begin
+  par := 0; impar := 0;
+  repeat
+    read(dato);
+    digParesImpares(dato, par, impar);
+  until (dato = 100);
+  writeln('Pares: ', par, ' Impares: ', impar);
+end.`,
+      prep: s => { let a = nums(s).filter(x => x >= 0 && x <= 32767).slice(0, 5); if (!a.includes(100)) a.push(100); return a.slice(0, a.indexOf(100) + 1); },
+      gen(a) {
+        const T = tracer(a); const M = { dato: "?", par: "?", impar: "?" };
+        let S = null;
+        const F = () => S ? [{ name: "Programa principal", vars: M }, { name: "digParesImpares", vars: S }] : [{ name: "Programa principal", vars: M }];
+        M.par = 0; M.impar = 0; T.step(15, "Se inicializan los contadores en el programa principal.", F());
+        do {
+          M.dato = T.read(); T.step(17, `Se lee ${M.dato}.`, F());
+          S = { num: M.dato, dig: "?", par: "→ par = " + M.par, impar: "→ impar = " + M.impar };
+          T.step(1, `Se invoca el módulo. num recibe una copia de ${M.dato}; par e impar son la misma memoria que las del principal.`, F());
+          while (S.num !== 0) {
+            S.dig = S.num % 10; T.step(5, `dig = ${S.dig}.`, F());
+            if (S.dig % 2 === 0) { M.par++; S.par = "→ par = " + M.par; T.step(7, `${S.dig} es par: se incrementa par (y cambia en el principal).`, F()); }
+            else { M.impar++; S.impar = "→ impar = " + M.impar; T.step(9, `${S.dig} es impar: se incrementa impar.`, F()); }
+            S.num = Math.trunc(S.num / 10); T.step(10, `num = ${S.num}. Es la copia: dato no cambia.`, F());
+          }
+          S = null; T.step(18, "Termina el módulo. Su copia de num y dig desaparecen.", F());
+          T.step(19, M.dato === 100 ? "dato = 100: termina el repeat." : `${M.dato} <> 100: otra vuelta.`, F());
+        } while (M.dato !== 100);
+        T.print(`Pares: ${M.par} Impares: ${M.impar}`); T.step(20, "Se informan los totales acumulados.", F(), "ok");
+        return T.frames;
+      } }
+  ],
+  corte: [
+    { id: "autos", nombre: "Promedio por marca", label: "Autos marca:precio (ordenados por marca)", def: "Fiat:12000 Fiat:9000 Ford:8000 Ford:30000 Ford:15000 Toyota:11000", wide: true,
+      code: () => `leerAuto(a);
+while (a.marca <> 'ZZZ') do begin
+  actual := a.marca;
+  cant := 0; suma := 0;
+  while (a.marca = actual) do begin
+    cant := cant + 1;
+    suma := suma + a.precio;
+    leerAuto(a);
+  end;
+  writeln(actual, ': ', suma / cant :0:2);
+end;`,
+      prep: s => {
+        let a = s.split(/[\s,]+/).filter(Boolean).map(x => { const [m, p] = x.split(":"); return { m: (m || "").slice(0, 12), p: +p || 0 }; }).filter(x => x.m && x.m !== "ZZZ").slice(0, 9);
+        if (!a.length) a = [{ m: "Fiat", p: 12000 }];
+        a.push({ m: "ZZZ", p: 0 });
+        return a;
+      },
+      tok: x => x.m === "ZZZ" ? "ZZZ" : `${x.m} $${x.p}`,
+      gen(a) {
+        const T = tracer(a.map(this.tok)); const V = { "a.marca": "?", "a.precio": "?", actual: "?", cant: "?", suma: "?" };
+        const F = () => [{ name: "Programa principal", vars: V }];
+        let k = -1; const leer = () => { k++; T.read(); const x = a[k]; V["a.marca"] = x.m; V["a.precio"] = x.m === "ZZZ" ? "?" : x.p; };
+        leer(); T.step(1, `Lectura previa: ${V["a.marca"]}.`, F());
+        const vistos = new Set();
+        while (V["a.marca"] !== "ZZZ") {
+          T.step(2, "No es el fin: empieza un grupo nuevo.", F());
+          V.actual = V["a.marca"];
+          const rep = vistos.has(V.actual); vistos.add(V.actual);
+          T.step(3, `Se guarda la marca del grupo: ${V.actual}.` + (rep ? " Ojo: esta marca ya tuvo un grupo antes. Si los datos no vienen ordenados, el corte de control da resultados partidos." : ""), F(), rep ? "err" : undefined);
+          V.cant = 0; V.suma = 0; T.step(4, "Los totales del grupo arrancan en 0.", F());
+          while (V["a.marca"] === V.actual) {
+            T.step(5, `${V["a.marca"]} = ${V.actual}: sigue el mismo grupo.`, F());
+            V.cant++; T.step(6, "Se cuenta el auto.", F());
+            V.suma += V["a.precio"]; T.step(7, "Se acumula el precio.", F());
+            leer(); T.step(8, `Se lee el siguiente: ${V["a.marca"]}.`, F());
+          }
+          T.step(5, `${V["a.marca"]} ≠ ${V.actual}: terminó el grupo.`, F());
+          T.print(`${V.actual}: ${(V.suma / V.cant).toFixed(2)}\n`);
+          T.step(10, `Se informa el promedio de ${V.actual}.`, F(), "ok");
+        }
+        T.step(2, "Llegó ZZZ: termina el procesamiento.", F(), "ok");
+        return T.frames;
+      } }
+  ]
+};
+/* los dos programas de suma comparten generador */
+TRAZAS.parametros.slice(0, 2).forEach(p => {
+  p.code = () => `program Ejercicio3;
+procedure suma(num1 : integer; ${p.ref ? "var " : ""}num2 : integer);
+begin
+  num2 := num1 + num2;
+  num1 := 0;
+end;
+var
+  i, x : integer;
+begin
+  read(x);
+  for i := 1 to 5 do
+    suma(i, x);
+  write(x);
+end.`;
+  p.prep = s => { const a = nums(s); return [a.length ? a[0] : 10]; };
+  p.gen = function (a) {
+    const T = tracer(a); const M = { i: "?", x: "?" }; let S = null;
+    const F = () => S ? [{ name: "Programa principal", vars: M }, { name: "suma", vars: S }] : [{ name: "Programa principal", vars: M }];
+    M.x = T.read(); T.step(10, `Se lee x = ${M.x}.`, F());
+    for (let i = 1; i <= 5; i++) {
+      M.i = i; T.step(11, `Vuelta ${i} del for.`, F());
+      S = { num1: i, num2: p.ref ? "→ x = " + M.x : M.x };
+      T.step(2, p.ref ? `num1 recibe una copia de i (${i}). num2 es un alias de x: misma memoria.` : `num1 recibe una copia de i (${i}) y num2 una copia de x (${M.x}).`, F());
+      if (p.ref) { M.x = i + M.x; S.num2 = "→ x = " + M.x; T.step(4, `num2 := ${i} + ... = ${M.x}. Como es var, x cambia en el principal.`, F()); }
+      else { S.num2 = i + S.num2; T.step(4, `num2 := ${i} + ... = ${S.num2}. Solo cambia la copia: x sigue en ${M.x}.`, F()); }
+      S.num1 = 0; T.step(5, "num1 := 0 modifica la copia. i no cambia.", F());
+      S = null; T.step(12, "Termina suma: sus parámetros por valor desaparecen.", F());
+    }
+    T.print(String(M.x)); T.step(13, p.ref ? `Se imprime ${M.x}.` : `Se imprime ${M.x}: el procedimiento nunca tocó x.`, F(), "ok");
+    return T.frames;
+  };
+});
+
+function simTraza(pane, progs) {
+  let sel = progs[0];
+  pane.innerHTML = `
+    <p style="max-width:70ch;margin:0 0 14px;color:var(--muted)">Una prueba de escritorio automática. Elegí un programa, cambiá los datos de entrada y avanzá línea por línea mirando cómo cambian las variables.</p>
+    <div class="simpick">${progs.map(p => `<button class="btn" type="button" data-p="${p.id}" aria-pressed="${p === sel}">${esc(p.nombre)}</button>`).join("")}</div>
+    <div class="sim">
+      <div class="stage">
+        <div class="controls"><label class="field wide"><span id="tlab"></span><input id="tin" type="text"></label><button class="btn pri" id="trun" type="button">Ejecutar</button></div>
+        <div class="trace-in" id="tinp" aria-label="Datos de entrada"></div>
+        <div class="frames" id="tfr"></div>
+        <div class="out" id="tout"></div>
+        <div class="msg" id="tmsg"></div>
+        <div id="tplay"></div>
+      </div>
+      <div id="tcode"></div>
+    </div>`;
+  const player = new Player($("#tplay", pane), (f) => {
+    $("#tinp", pane).innerHTML = f.tokens.map((x, k) => `<span class="${k === f.pos ? "cur" : k < f.pos ? "done" : ""}">${esc(x)}</span>`).join("");
+    $("#tfr", pane).innerHTML = f.fr.map(fr => `<div class="frame"><h4>${esc(fr.name)}</h4><table>${Object.entries(fr.vars).map(([k, v]) =>
+      `<tr><td>${esc(k)}</td><td class="${f.ch.includes(fr.name + "." + k) ? "chg" : ""}">${esc(v)}</td></tr>`).join("")}</table></div>`).join("");
+    $("#tout", pane).textContent = f.out;
+    setMsg($("#tmsg", pane), f);
+    setCodeLine($("#tcode", pane), f.line);
+  });
+  const load = (auto) => {
+    const data = sel.prep($("#tin", pane).value);
+    $("#tcode", pane).innerHTML = ide(sel.code(data.length), { numbers: true, title: sel.nombre });
+    player.load(sel.gen(data), auto);
+  };
+  const pick = (p) => {
+    sel = p;
+    $$(".simpick .btn", pane).forEach(b => b.setAttribute("aria-pressed", String(b.dataset.p === p.id)));
+    $("#tlab", pane).textContent = p.label; $("#tin", pane).value = p.def;
+    $("#tin", pane).closest(".field").classList.toggle("wide", true);
+    load(false);
+  };
+  $$(".simpick .btn", pane).forEach(b => b.onclick = () => pick(progs.find(p => p.id === b.dataset.p)));
+  $("#trun", pane).onclick = () => load(true);
+  $("#tin", pane).addEventListener("keydown", e => { if (e.key === "Enter") load(true); });
+  pick(sel);
+}
+/* ====== simulador de vectores ====== */
+const VCODE = {
+  agregar: `procedure agregar(var v : vector; var dimL : integer;
+                  valor : integer; var ok : boolean);
+begin
+  ok := (dimL < DIMF);
+  if ok then begin
+    dimL := dimL + 1;
+    v[dimL] := valor;
+  end;
+end;`,
+  insertar: `procedure insertar(var v : vector; var dimL : integer;
+                   valor, pos : integer; var ok : boolean);
+var i : integer;
+begin
+  ok := (dimL < DIMF) and (pos >= 1) and (pos <= dimL + 1);
+  if ok then begin
+    for i := dimL downto pos do
+      v[i + 1] := v[i];
+    v[pos] := valor;
+    dimL := dimL + 1;
+  end;
+end;`,
+  eliminar: `procedure eliminar(var v : vector; var dimL : integer;
+                   pos : integer; var ok : boolean);
+var i : integer;
+begin
+  ok := (pos >= 1) and (pos <= dimL);
+  if ok then begin
+    for i := pos to dimL - 1 do
+      v[i] := v[i + 1];
+    dimL := dimL - 1;
+  end;
+end;`,
+  buscar: `function buscar(v : vector; dimL, n : integer) : integer;
+var pos : integer;
+begin
+  pos := 1;
+  while (pos <= dimL) and (v[pos] <> n) do
+    pos := pos + 1;
+  if (pos <= dimL) then buscar := pos
+  else buscar := -1;
+end;`,
+  dico: `function buscarDico(v : vector; dimL, n : integer) : boolean;
+var ini, fin, medio : integer;
+begin
+  ini := 1; fin := dimL;
+  medio := (ini + fin) div 2;
+  while (ini <= fin) and (v[medio] <> n) do begin
+    if (n < v[medio]) then fin := medio - 1
+    else ini := medio + 1;
+    medio := (ini + fin) div 2;
+  end;
+  buscarDico := (ini <= fin);
+end;`
+};
+const DIMF = 10;
+
+function simVector(pane) {
+  let st = { v: [4, 9, 2, 7, 5, null, null, null, null, null], dimL: 5 };
+  let op = "agregar";
+  pane.innerHTML = `
+    <p style="max-width:70ch;margin:0 0 14px;color:var(--muted)">Un vector de dimensión física 10. Las celdas punteadas están fuera de la dimensión lógica: pueden tener valores viejos, pero no forman parte del vector. Probá insertar o eliminar y mirá el corrimiento.</p>
+    <div class="sim">
+      <div class="stage">
+        <div class="controls">
+          <label class="field"><span>Valor</span><input id="vval" type="number" value="6"></label>
+          <label class="field"><span>Posición</span><input id="vpos" type="number" value="2" min="1" max="11"></label>
+        </div>
+        <div class="row">
+          <button class="btn pri" type="button" data-op="agregar">Agregar al final</button>
+          <button class="btn" type="button" data-op="insertar">Insertar en posición</button>
+          <button class="btn" type="button" data-op="eliminar">Eliminar posición</button>
+          <button class="btn" type="button" data-op="buscar">Buscar valor</button>
+          <button class="btn" type="button" data-op="dico">Búsqueda dicotómica</button>
+        </div>
+        <div class="row">
+          <button class="btn" type="button" id="vdes">Cargar desordenado</button>
+          <button class="btn" type="button" id="vord">Cargar ordenado</button>
+          <button class="btn" type="button" id="vvac">Vaciar (dimL := 0)</button>
+        </div>
+        <div class="vec" id="vvec"></div>
+        <div class="msg" id="vmsg"></div>
+        <div id="vplay"></div>
+      </div>
+      <div id="vcode"></div>
+    </div>`;
+  const draw = (f) => {
+    const s = f.st;
+    $("#vvec", pane).innerHTML = s.v.map((x, k) => {
+      const i = k + 1;
+      let cls = i <= s.dimL ? "used" : (x !== null ? "stale" : "");
+      if (f.mk && f.mk[i]) cls += " " + f.mk[i];
+      const tag = (f.tg && f.tg[i]) ? `<span class="tag">${f.tg[i]}</span>` : (i === s.dimL ? `<span class="tag">dimL</span>` : "");
+      const tt = (f.tt && f.tt[i]) ? `<span class="tagt">${f.tt[i]}</span>` : "";
+      return `<div class="cell ${cls}">${tt}<div class="box">${x === null ? "" : x}</div><span class="idx">${i}</span>${tag}</div>`;
+    }).join("");
+    setMsg($("#vmsg", pane), f);
+    setCodeLine($("#vcode", pane), f.line);
+  };
+  const player = new Player($("#vplay", pane), draw);
+  const cp = s => ({ v: s.v.slice(), dimL: s.dimL });
+  const showCode = (k) => { $("#vcode", pane).innerHTML = ide(VCODE[k], { numbers: true, title: k === "dico" ? "buscarDico" : k }); };
+
+  function run(k) {
+    op = k;
+    const val = parseInt($("#vval", pane).value, 10);
+    const pos = parseInt($("#vpos", pane).value, 10);
+    if (Number.isNaN(val) && k !== "eliminar") { toast("Ingresá un valor numérico"); return; }
+    const F = []; let s = cp(st);
+    const fr = (line, msg, extra = {}) => F.push(Object.assign({ line, msg, st: cp(s) }, extra));
+    if (k === "agregar") {
+      const ok = s.dimL < DIMF;
+      fr(4, ok ? `dimL (${s.dimL}) < DIMF (${DIMF}): hay lugar.` : `dimL = DIMF = ${DIMF}: el vector está lleno. ok := false.`, ok ? {} : { kind: "err" });
+      if (ok) {
+        s.dimL++; fr(6, `dimL pasa a ${s.dimL}.`);
+        s.v[s.dimL - 1] = val; fr(7, `v[${s.dimL}] := ${val}.`, { mk: { [s.dimL]: "new" }, kind: "ok" });
+      }
+    }
+    if (k === "insertar") {
+      const ok = s.dimL < DIMF && pos >= 1 && pos <= s.dimL + 1;
+      fr(5, ok ? `Hay lugar y la posición ${pos} está entre 1 y dimL + 1 (${s.dimL + 1}).` :
+        (s.dimL >= DIMF ? "El vector está lleno: no se puede insertar." : `La posición ${pos} no es válida: tiene que estar entre 1 y ${s.dimL + 1}.`), ok ? {} : { kind: "err" });
+      if (ok) {
+        for (let i = s.dimL; i >= pos; i--) {
+          fr(7, `i = ${i}: hay que mover v[${i}] una posición a la derecha.`, { mk: { [i]: "cmp" }, tg: { [i]: "i" } });
+          s.v[i] = s.v[i - 1];
+          fr(8, `v[${i + 1}] := v[${i}]. Ahora el ${s.v[i]} está repetido; el de la izquierda se va a pisar.`, { mk: { [i + 1]: "mov" }, tg: { [i]: "i" } });
+        }
+        if (pos > s.dimL) fr(7, `pos = dimL + 1: no hay nada que correr.`);
+        s.v[pos - 1] = val; fr(9, `v[${pos}] := ${val}.`, { mk: { [pos]: "new" } });
+        s.dimL++; fr(10, `dimL pasa a ${s.dimL}. Inserción terminada.`, { mk: { [pos]: "new" }, kind: "ok" });
+      }
+    }
+    if (k === "eliminar") {
+      const ok = pos >= 1 && pos <= s.dimL;
+      fr(5, ok ? `La posición ${pos} está entre 1 y dimL (${s.dimL}).` : `La posición ${pos} no es válida: tiene que estar entre 1 y ${s.dimL}.`, ok ? { mk: { [pos]: "cmp" } } : { kind: "err" });
+      if (ok) {
+        for (let i = pos; i <= s.dimL - 1; i++) {
+          fr(7, `i = ${i}: se trae el valor de la derecha.`, { mk: { [i + 1]: "cmp" }, tg: { [i]: "i" } });
+          s.v[i - 1] = s.v[i];
+          fr(8, `v[${i}] := v[${i + 1}].`, { mk: { [i]: "mov" }, tg: { [i]: "i" } });
+        }
+        s.dimL--; fr(9, `dimL pasa a ${s.dimL}. El valor de la posición ${s.dimL + 1} queda ahí, pero ya no es parte del vector.`, { kind: "ok" });
+      }
+    }
+    if (k === "buscar") {
+      let p = 1; fr(4, "pos := 1.", { tg: { 1: "pos" } });
+      while (p <= s.dimL && s.v[p - 1] !== val) {
+        fr(5, `v[${p}] = ${s.v[p - 1]} ≠ ${val}: sigo.`, { mk: { [p]: "cmp" }, tg: { [p]: "pos" } });
+        p++; fr(6, `pos := ${p}.`, { tg: { [p]: "pos" } });
+      }
+      if (p <= s.dimL) fr(7, `v[${p}] = ${val}: encontrado en la posición ${p}. Se revisaron ${p} elementos.`, { mk: { [p]: "found" }, tg: { [p]: "pos" }, kind: "ok" });
+      else fr(8, `pos = ${p} > dimL: ${val} no está. Hubo que recorrer los ${s.dimL} elementos.`, { kind: "err" });
+    }
+    if (k === "dico") {
+      const arr = s.v.slice(0, s.dimL);
+      const sorted = arr.every((x, i) => i === 0 || arr[i - 1] <= x);
+      if (!sorted) {
+        fr(1, "El vector no está ordenado. La búsqueda dicotómica solo funciona sobre un vector ordenado: probá con \"Cargar ordenado\".", { kind: "err" });
+      } else {
+        let ini = 1, fin = s.dimL, m = Math.floor((ini + fin) / 2), vueltas = 0;
+        const tags = () => { const t = {}; if (ini <= DIMF) t[ini] = "ini"; if (fin >= 1) t[fin] = (t[fin] ? t[fin] + "/" : "") + "fin"; return t; };
+        fr(4, `ini := 1; fin := ${fin}.`, { tg: tags() });
+        fr(5, `medio := (${ini} + ${fin}) div 2 = ${m}.`, { tg: tags(), tt: { [m]: "medio" }, mk: { [m]: "cmp" } });
+        while (ini <= fin && s.v[m - 1] !== val) {
+          vueltas++;
+          if (val < s.v[m - 1]) { fin = m - 1; fr(7, `${val} < v[${m}] = ${s.v[m - 1]}: descarto la mitad derecha. fin := ${fin}.`, { tg: tags() }); }
+          else { ini = m + 1; fr(8, `${val} > v[${m}] = ${s.v[m - 1]}: descarto la mitad izquierda. ini := ${ini}.`, { tg: tags() }); }
+          m = Math.floor((ini + fin) / 2);
+          fr(9, `medio := ${m}.`, { tg: tags(), tt: m >= 1 && m <= DIMF ? { [m]: "medio" } : {}, mk: ini <= fin ? { [m]: "cmp" } : {} });
+        }
+        if (ini <= fin) fr(11, `v[${m}] = ${val}: encontrado tras ${vueltas + 1} comparaciones (la lineal podría haber necesitado hasta ${s.dimL}).`, { mk: { [m]: "found" }, tt: { [m]: "medio" }, kind: "ok" });
+        else fr(11, `ini (${ini}) > fin (${fin}): ${val} no está.`, { kind: "err" });
+      }
+    }
+    st = s;
+    showCode(k);
+    player.load(F, true);
+  }
+  $$("[data-op]", pane).forEach(b => b.onclick = () => run(b.dataset.op));
+  const setSt = (v, msg) => {
+    st = { v: v.concat(Array(DIMF - v.length).fill(null)), dimL: v.length };
+    showCode(op); player.load([{ line: 0, msg, st: cp(st) }]);
+  };
+  $("#vdes", pane).onclick = () => setSt(Array.from({ length: 6 }, () => 1 + Math.floor(Math.random() * 40)), "Se cargaron 6 valores al azar.");
+  $("#vord", pane).onclick = () => { const a = Array.from({ length: 7 }, () => 1 + Math.floor(Math.random() * 60)).sort((x, y) => x - y); setSt(a, "Se cargaron 7 valores ordenados de forma ascendente. Ya podés usar la búsqueda dicotómica."); };
+  $("#vvac", pane).onclick = () => { st = { v: st.v.slice(), dimL: 0 }; showCode(op); player.load([{ line: 0, msg: "dimL := 0. Los valores siguen en memoria, pero el vector se considera vacío.", st: cp(st) }]); };
+  showCode(op);
+  player.load([{ line: 0, msg: "Elegí una operación. Valor y posición se toman de los campos de arriba.", st: cp(st) }]);
+}
+
+/* ====== simulador de punteros ====== */
+function simPunteros(pane) {
+  let S;
+  const reset = () => { S = { vars: { p: "?", q: "?" }, heap: [], next: 0x1A0, log: [], out: "", msg: { t: "Las variables p y q son punteros a integer. Todavía no se les asignó nada: tienen basura.", k: "" }, last: 0 }; };
+  reset();
+  pane.innerHTML = `
+    <p style="max-width:70ch;margin:0 0 14px;color:var(--muted)">Ejecutá sentencias sobre dos punteros a integer y mirá qué pasa en la memoria estática y en el heap. Cada botón agrega una línea al programa de la derecha. Probá los errores clásicos: usar p^ sin new, o después de dispose.</p>
+    <div class="sim">
+      <div class="stage">
+        <div class="controls">
+          <label class="field"><span>Puntero</span><select id="pvar"><option value="p">p</option><option value="q">q</option></select></label>
+          <label class="field"><span>Valor</span><input id="pval" type="number" value="7"></label>
+        </div>
+        <div class="row" id="pbtns"></div>
+        <div class="mem">
+          <div class="col"><h4><span>Memoria estática</span><span>8 bytes</span></h4><div id="pst"></div></div>
+          <div class="col"><h4><span>Heap (memoria dinámica)</span><span id="pused"></span></h4><div id="pheap"></div></div>
+        </div>
+        <div class="out" id="pout"></div>
+        <div class="msg" id="pmsg"></div>
+        <div class="row"><button class="btn" type="button" id="preset">Empezar de nuevo</button></div>
+      </div>
+      <div id="pcode"></div>
+    </div>`;
+  const B = [["new", "new(X)"], ["asig", "X^ := valor"], ["write", "writeln(X^)"], ["dispose", "dispose(X)"], ["nil", "X := nil"], ["alias", "X := otro"]];
+  const renderBtns = () => {
+    const x = $("#pvar", pane).value, o = x === "p" ? "q" : "p";
+    $("#pbtns", pane).innerHTML = B.map(([k, l]) => `<button class="btn${k === "new" ? " pri" : ""}" type="button" data-pk="${k}">${esc(l.replace("X", x).replace("otro", o).replace("valor", $("#pval", pane).value || "0"))}</button>`).join("");
+    $$("[data-pk]", pane).forEach(b => b.onclick = () => act(b.dataset.pk));
+  };
+  const blk = a => S.heap.find(b => b.addr === a);
+  const color = a => { const i = S.heap.findIndex(b => b.addr === a); return "c" + (i % 6); };
+  const hex = n => "@" + n.toString(16).toUpperCase();
+  function check(x) {
+    const a = S.vars[x];
+    if (a === "?") return `Error: ${x} nunca recibió una dirección (falta new(${x})). ${x}^ apunta a cualquier lugar de la memoria.`;
+    if (a === "nil") return `Error: ${x} vale nil, no apunta a nada. No se puede acceder a ${x}^.`;
+    if (blk(a).freed) return `Error: la memoria a la que apunta ${x} ya fue liberada con dispose. ${x} quedó "colgando".`;
+    return null;
+  }
+  function markLost() {
+    const lost = [];
+    S.heap.forEach(b => {
+      if (!b.freed && !b.lost && b.addr !== S.vars.p && b.addr !== S.vars.q) { b.lost = true; lost.push(b.addr); }
+    });
+    return lost.length ? ` Atención: el bloque ${lost.join(", ")} quedó sin ningún puntero que lo apunte. Esa memoria está perdida: ya no se puede usar ni liberar.` : "";
+  }
+  function act(k) {
+    const x = $("#pvar", pane).value, o = x === "p" ? "q" : "p";
+    const val = parseInt($("#pval", pane).value, 10) || 0;
+    let line = "", msg = "", kind = "";
+    if (k === "new") {
+      const a = hex(S.next); S.next += 0x10;
+      S.heap.push({ addr: a, val: "?", freed: false, lost: false });
+      S.vars[x] = a; line = `new(${x});`;
+      msg = `Se reservaron 2 bytes en el heap (lo que ocupa un integer) en ${a}. ${x} guarda esa dirección. El contenido todavía es basura.` + markLost();
+      kind = msg.includes("perdida") ? "err" : "ok";
+    } else if (k === "asig") {
+      line = `${x}^ := ${val};`;
+      const e = check(x);
+      if (e) { msg = e; kind = "err"; } else { blk(S.vars[x]).val = val; msg = `Se escribe ${val} en la dirección ${S.vars[x]}.` + (S.vars[o] === S.vars[x] ? ` Como ${o} apunta al mismo lugar, ${o}^ también vale ${val}.` : ""); kind = "ok"; }
+    } else if (k === "write") {
+      line = `writeln(${x}^);`;
+      const e = check(x);
+      if (e) { msg = e; kind = "err"; } else { const v = blk(S.vars[x]).val; S.out += v + "\n"; msg = v === "?" ? `${x}^ nunca se inicializó: imprime basura.` : `Imprime ${v}.`; kind = v === "?" ? "err" : "ok"; }
+    } else if (k === "dispose") {
+      line = `dispose(${x});`;
+      const e = check(x);
+      if (e) { msg = e; kind = "err"; } else { blk(S.vars[x]).freed = true; msg = `Se liberan los 2 bytes de ${S.vars[x]}. Ojo: ${x} sigue guardando esa dirección, pero ya no es válida.` + (S.vars[o] === S.vars[x] ? ` ${o} también queda colgando.` : "") + " Conviene hacer " + x + " := nil."; kind = "ok"; }
+    } else if (k === "nil") {
+      line = `${x} := nil;`; S.vars[x] = "nil";
+      msg = `${x} ya no apunta a nada.` + markLost(); kind = msg.includes("perdida") ? "err" : "ok";
+    } else if (k === "alias") {
+      line = `${x} := ${o};`; S.vars[x] = S.vars[o];
+      msg = S.vars[o] === "?" ? `${o} tenía basura y ahora ${x} también.` : `${x} copia la dirección de ${o}: ahora los dos apuntan al mismo lugar. No se copió el contenido.` + markLost();
+      kind = msg.includes("perdida") || S.vars[o] === "?" ? "err" : "ok";
+    }
+    S.log.push(line); S.last = S.log.length; S.msg = { t: msg, k: kind };
+    draw();
+  }
+  function draw() {
+    const v = (x) => {
+      const a = S.vars[x];
+      const body = a === "?" ? `<span class="addr">? basura</span>` : a === "nil" ? `<span class="addr">nil</span>` : `<span class="addr cx ${color(a)}">${a}</span>${blk(a).freed ? `<span class="empty">liberada</span>` : ""}`;
+      return `<div class="var"><span class="nm">${x}</span>${body}<span class="empty" style="margin-left:auto">4 bytes</span></div>`;
+    };
+    $("#pst", pane).innerHTML = v("p") + v("q");
+    const vis = S.heap.slice(-8);
+    $("#pheap", pane).innerHTML = vis.length ? vis.map(b => {
+      const who = ["p", "q"].filter(x => S.vars[x] === b.addr).join(", ");
+      return `<div class="blk cx ${color(b.addr)}${b.freed ? " freed" : ""}${b.lost ? " lost" : ""}"><span class="a">${b.addr}</span><span>${b.freed ? "liberado" : b.lost ? "perdido" : who ? "← " + who : ""}</span><span class="v">${b.freed ? "" : b.val}</span></div>`;
+    }).join("") : `<div class="empty">Vacío. Hacé new para reservar memoria.</div>`;
+    const used = S.heap.filter(b => !b.freed).length * 2;
+    $("#pused", pane).textContent = used + " bytes en uso";
+    $("#pout", pane).textContent = S.out;
+    const m = $("#pmsg", pane); m.className = "msg" + (S.msg.k === "err" ? " err" : S.msg.k === "ok" ? " okm" : ""); m.textContent = S.msg.t;
+    const prog = `program punteros;\ntype\n  pNum = ^integer;\nvar\n  p, q : pNum;\nbegin\n` + S.log.map(l => "  " + l).join("\n") + (S.log.length ? "\n" : "") + "end.";
+    $("#pcode", pane).innerHTML = ide(prog, { numbers: true, title: "tu programa" });
+    setCodeLine($("#pcode", pane), S.last ? 6 + S.last : 0);
+  }
+  $("#pvar", pane).onchange = renderBtns;
+  $("#pval", pane).oninput = renderBtns;
+  $("#preset", pane).onclick = () => { reset(); draw(); };
+  renderBtns(); draw();
+}
+
+/* ====== simulador de listas ====== */
+const LCODE = {
+  adelante: `procedure agregarAdelante(var L : lista; n : integer);
+var nue : lista;
+begin
+  new(nue);
+  nue^.dato := n;
+  nue^.sig := L;
+  L := nue;
+end;`,
+  atras: `procedure agregarAtras(var pri, ult : lista; n : integer);
+var nue : lista;
+begin
+  new(nue);
+  nue^.dato := n;
+  nue^.sig := nil;
+  if (pri = nil) then pri := nue
+  else ult^.sig := nue;
+  ult := nue;
+end;`,
+  ordenado: `procedure insertarOrdenado(var pri : lista; n : integer);
+var nue, ant, act : lista;
+begin
+  new(nue);
+  nue^.dato := n;
+  act := pri; ant := pri;
+  while (act <> nil) and (act^.dato < n) do begin
+    ant := act;
+    act := act^.sig;
+  end;
+  if (act = pri) then pri := nue
+  else ant^.sig := nue;
+  nue^.sig := act;
+end;`,
+  eliminar: `procedure eliminar(var pri : lista; n : integer; var ok : boolean);
+var ant, act : lista;
+begin
+  act := pri; ant := pri;
+  while (act <> nil) and (act^.dato <> n) do begin
+    ant := act;
+    act := act^.sig;
+  end;
+  ok := (act <> nil);
+  if ok then begin
+    if (act = pri) then pri := act^.sig
+    else ant^.sig := act^.sig;
+    dispose(act);
+  end;
+end;`,
+  recorrer: `procedure imprimir(L : lista);
+begin
+  while (L <> nil) do begin
+    writeln(L^.dato);
+    L := L^.sig;
+  end;
+end;`
+};
+function simListas(pane) {
+  let list = [10, 21, 35];
+  let op = "adelante";
+  pane.innerHTML = `
+    <p style="max-width:70ch;margin:0 0 14px;color:var(--muted)">Cada caja es un nodo: el dato y el puntero sig. Las etiquetas muestran a dónde apuntan pri, ult, ant, act y nue en cada paso del código.</p>
+    <div class="sim">
+      <div class="stage">
+        <div class="controls"><label class="field"><span>Valor</span><input id="lval" type="number" value="18"></label></div>
+        <div class="row">
+          <button class="btn pri" type="button" data-lop="adelante">Agregar adelante</button>
+          <button class="btn" type="button" data-lop="atras">Agregar atrás</button>
+          <button class="btn" type="button" data-lop="ordenado">Insertar ordenado</button>
+          <button class="btn" type="button" data-lop="eliminar">Eliminar valor</button>
+          <button class="btn" type="button" data-lop="recorrer">Recorrer e imprimir</button>
+        </div>
+        <div class="row">
+          <button class="btn" type="button" id="lej">Lista de ejemplo ordenada</button>
+          <button class="btn" type="button" id="lvac">Lista vacía (pri := nil)</button>
+        </div>
+        <div class="nuebox" id="lnue"></div>
+        <div class="lst" id="llst"></div>
+        <div class="out" id="lout"></div>
+        <div class="msg" id="lmsg"></div>
+        <div id="lplay"></div>
+      </div>
+      <div id="lcode"></div>
+    </div>`;
+  const draw = (f) => {
+    const n = f.list.length, lb = f.lb || {}, lb2 = f.lb2 || {}, cls = f.cls || {};
+    const label = i => { const a = []; if (f.ult && i === n - 1) a.push("ult"); (lb[i] || []).forEach(x => a.push(x)); return a.join(" · "); };
+    let h = `<span class="ptr">${n ? "pri →" : "pri = nil"}</span>`;
+    f.list.forEach((d, i) => {
+      const l = label(i), l2 = (lb2[i] || []).join(" · ");
+      h += `<div class="node ${cls[i] || ""}">${l ? `<span class="lb">${l}</span>` : ""}<span class="d">${d}</span><span class="sg">sig</span>${l2 ? `<span class="lb2">${l2}</span>` : ""}</div><span class="arrow" aria-hidden="true"></span>`;
+    });
+    if (n) h += `<span class="nil" style="position:relative">${(lb[n] || []).length ? `<span class="lb" style="position:absolute;top:-22px;left:0;right:0;text-align:center;font-family:var(--f-code);font-size:11px;font-weight:700;color:var(--accent)">${lb[n].join(" · ")}</span>` : ""}nil</span>`;
+    const box = $("#llst", pane); box.innerHTML = h;
+    const foc = box.querySelector(".node.nw, .node.del, .node.hl");
+    if (foc) box.scrollLeft = Math.max(0, foc.offsetLeft - box.clientWidth / 2);
+    $("#lnue", pane).innerHTML = f.nue ? `<span class="ptr">nue →</span><div class="node nw"><span class="d">${f.nue.d}</span><span class="sg">sig</span></div><span>${f.nue.s ? "sig → " + f.nue.s : "sig: sin asignar"}</span>` : "";
+    $("#lout", pane).textContent = f.out || "";
+    setMsg($("#lmsg", pane), f);
+    setCodeLine($("#lcode", pane), f.line);
+  };
+  const player = new Player($("#lplay", pane), draw);
+  const showCode = k => { $("#lcode", pane).innerHTML = ide(LCODE[k], { numbers: true, title: k === "recorrer" ? "imprimir" : k }); };
+  function run(k) {
+    op = k;
+    const v = parseInt($("#lval", pane).value, 10);
+    if (Number.isNaN(v) && k !== "recorrer") { toast("Ingresá un valor numérico"); return; }
+    if ((k === "adelante" || k === "atras" || k === "ordenado") && list.length >= 9) { toast("La lista de prueba admite hasta 9 nodos"); return; }
+    const F = []; let L = list.slice();
+    const fr = (line, msg, o = {}) => F.push(Object.assign({ line, msg, list: L.slice() }, o));
+    const desc = i => i < L.length ? `el nodo ${L[i]}` : "nil";
+    if (k === "adelante") {
+      fr(4, "new(nue): se reserva memoria para un nodo nuevo.", { nue: { d: "?" } });
+      fr(5, `nue^.dato := ${v}.`, { nue: { d: v } });
+      fr(6, `nue^.sig := L. El nuevo nodo apunta a lo que hoy es el primero: ${L.length ? "el nodo " + L[0] : "nil"}.`, { nue: { d: v, s: L.length ? "nodo " + L[0] : "nil" }, cls: { 0: "hl" } });
+      L.unshift(v); fr(7, `L := nue. Ahora el primero es ${v}. Por eso la lista queda en orden inverso al de lectura.`, { cls: { 0: "nw" }, kind: "ok" });
+    }
+    if (k === "atras") {
+      fr(4, "new(nue).", { nue: { d: "?" }, ult: true });
+      fr(5, `nue^.dato := ${v}.`, { nue: { d: v }, ult: true });
+      fr(6, "nue^.sig := nil: va a ser el último.", { nue: { d: v, s: "nil" }, ult: true });
+      if (!L.length) fr(7, "pri = nil: la lista estaba vacía, así que pri := nue.", { nue: { d: v, s: "nil" }, ult: true });
+      else fr(8, `ult^.sig := nue: el último actual (${L[L.length - 1]}) se engancha con el nuevo. No hizo falta recorrer.`, { nue: { d: v, s: "nil" }, ult: true, cls: { [L.length - 1]: "hl" } });
+      L.push(v); fr(9, "ult := nue.", { ult: true, cls: { [L.length - 1]: "nw" }, kind: "ok" });
+    }
+    if (k === "ordenado") {
+      const sorted = L.every((x, i) => i === 0 || L[i - 1] <= x);
+      fr(4, "new(nue).", { nue: { d: "?" } });
+      fr(5, `nue^.dato := ${v}.`, { nue: { d: v } });
+      let act = 0, ant = 0;
+      const lab = () => { const o = {}; const add = (i, s) => (o[i] ||= []).push(s); add(ant, "ant"); add(act, "act"); if (act === ant && act >= L.length) o[act] = ["ant", "act"]; return o; };
+      fr(6, "act := pri; ant := pri.", { nue: { d: v }, lb: lab() });
+      if (!sorted) fr(6, "Ojo: la lista no está ordenada, así que el resultado tampoco lo va a estar. Usá \"Lista de ejemplo ordenada\".", { nue: { d: v }, lb: lab(), kind: "err" });
+      while (act < L.length && L[act] < v) {
+        fr(7, `${L[act]} < ${v}: hay que seguir avanzando.`, { nue: { d: v }, lb: lab(), cls: { [act]: "hl" } });
+        ant = act; fr(8, "ant := act.", { nue: { d: v }, lb: lab() });
+        act++; fr(9, `act := act^.sig (${desc(act)}).`, { nue: { d: v }, lb: lab() });
+      }
+      fr(7, act < L.length ? `${L[act]} ≥ ${v}: el nuevo va antes de act.` : "act = nil: el nuevo va al final.", { nue: { d: v }, lb: lab(), cls: act < L.length ? { [act]: "hl" } : {} });
+      if (act === 0) fr(11, "act = pri: el nuevo va primero, así que pri := nue.", { nue: { d: v, s: desc(0) }, lb: lab() });
+      else fr(12, `ant^.sig := nue: el nodo ${L[ant]} ahora apunta al nuevo.`, { nue: { d: v }, lb: lab(), cls: { [ant]: "hl" } });
+      const pos = act; L.splice(pos, 0, v);
+      fr(13, `nue^.sig := act. El ${v} quedó enganchado entre ${pos ? L[pos - 1] : "pri"} y ${pos + 1 < L.length ? L[pos + 1] : "nil"}.`, { cls: { [pos]: "nw" }, kind: "ok" });
+    }
+    if (k === "eliminar") {
+      let act = 0, ant = 0;
+      const lab = () => { const o = {}; (o[ant] ||= []).push("ant"); (o[act] ||= []).push("act"); return o; };
+      fr(4, "act := pri; ant := pri.", { lb: lab() });
+      while (act < L.length && L[act] !== v) {
+        fr(5, `${L[act]} ≠ ${v}: sigo buscando.`, { lb: lab(), cls: { [act]: "hl" } });
+        ant = act; fr(6, "ant := act.", { lb: lab() });
+        act++; fr(7, `act := act^.sig (${desc(act)}).`, { lb: lab() });
+      }
+      if (act >= L.length) fr(9, `act = nil: ${v} no está en la lista. ok := false.`, { lb: lab(), kind: "err" });
+      else {
+        fr(9, `Encontrado: ok := true.`, { lb: lab(), cls: { [act]: "del" } });
+        if (act === 0) fr(11, `Es el primero: pri := act^.sig (${desc(1)}).`, { lb: lab(), cls: { 0: "del" } });
+        else fr(12, `ant^.sig := act^.sig: el ${L[ant]} saltea al ${v} y apunta a ${desc(act + 1)}.`, { lb: lab(), cls: { [act]: "del", [ant]: "hl" } });
+        L.splice(act, 1); fr(13, "dispose(act): se libera la memoria del nodo.", { kind: "ok" });
+      }
+    }
+    if (k === "recorrer") {
+      let out = "";
+      for (let i = 0; i < L.length; i++) {
+        fr(3, `L <> nil: L apunta al ${L[i]}.`, { lb: { [i]: ["L"] }, out });
+        out += L[i] + "\n"; fr(4, `Se imprime ${L[i]}.`, { lb: { [i]: ["L"] }, cls: { [i]: "hl" }, out });
+        fr(5, "L := L^.sig.", { lb: { [i + 1]: ["L"] }, out });
+      }
+      fr(3, "L = nil: fin del recorrido. Como L se pasó por valor, el pri del programa no se movió.", { lb: { [L.length]: ["L"] }, out, kind: "ok" });
+    }
+    list = L;
+    showCode(k);
+    player.load(F, true);
+  }
+  $$("[data-lop]", pane).forEach(b => b.onclick = () => run(b.dataset.lop));
+  $("#lej", pane).onclick = () => { list = [5, 12, 18, 30, 44]; showCode(op); player.load([{ line: 0, msg: "Lista ordenada de forma ascendente. Probá insertar ordenado un 20 o un 2.", list: list.slice() }]); };
+  $("#lvac", pane).onclick = () => { list = []; showCode(op); player.load([{ line: 0, msg: "Lista vacía: pri = nil.", list: [] }]); };
+  showCode(op);
+  player.load([{ line: 0, msg: "Elegí una operación. El valor se toma del campo de arriba.", list: list.slice() }]);
+}
+
+/* ====== inicio ====== */
+renderNav();
+route(true);
+</script>
+</body></html>
