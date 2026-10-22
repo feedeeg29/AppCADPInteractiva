@@ -1,4 +1,6 @@
 import type { Tema } from "../types";
+import { guiaP6a } from "../guia/p6a";
+import { guiaP6b } from "../guia/p6b";
 
 const tema: Tema = {
   id: "listas",
@@ -179,116 +181,7 @@ end;`,
       exp: "De ahí en adelante todos son ≥ B, así que ninguno entra en la sublista."
     }
   ],
-  ejercicios: [
-    {
-      ref: "P6 Ej 2",
-      titulo: "Los 9 errores",
-      enunciado: "Un programa lee personas hasta el DNI 0 y las imprime en orden inverso. Encontrar los 9 errores.",
-      pista: "Revisá: pasaje de parámetros (var), new, el tipo de la variable p, el while de generarLista y los campos en imprimir.",
-      sol: `{ 1. leerPersona: p debe ser var.
-  2. agregarAdelante: l debe ser var.
-  3. agregarAdelante: falta new(aux).
-  4. generarLista: p debe ser persona, no nodo.
-  5. generarLista: falta leerPersona(p) dentro del while
-     (si no, el bucle es infinito).
-  6. Programa principal: falta l := nil antes de generarLista.
-  7. imprimirInformacion: l^.nombre debe ser l^.dato.nombre.
-  8. imprimirInformacion: l^.apellido debe ser l^.dato.apellido.
-  9. imprimirInformacion: l no debería ser var
-     (al recorrer se pierde el inicio de la lista). }`
-    },
-    {
-      ref: "P6 Ej 4",
-      titulo: "Máximo, mínimo y múltiplos",
-      enunciado: "Usando la lista del ejercicio 1: módulos que devuelvan el máximo, el mínimo y la cantidad de elementos múltiplos de A.",
-      pista: "Tres funciones que recorren la lista por valor.",
-      sol: `function maximo(L : lista) : integer;
-var max : integer;
-begin
-  max := -32768;
-  while (L <> nil) do begin
-    if (L^.num > max) then max := L^.num;
-    L := L^.sig;
-  end;
-  maximo := max;
-end;
-
-function multiplos(L : lista; A : integer) : integer;
-var cant : integer;
-begin
-  cant := 0;
-  while (L <> nil) do begin
-    if (L^.num mod A = 0) then cant := cant + 1;
-    L := L^.sig;
-  end;
-  multiplos := cant;
-end;
-{ minimo es igual a maximo, con 32767 y '<'. }`
-    },
-    {
-      ref: "P6 Ej 9c",
-      titulo: "Sublista entre A y B",
-      enunciado: "Recibir una lista L y dos valores A y B, y devolver una lista nueva con los elementos mayores que A y menores que B. (d) Si L está ordenada ascendente. (e) Si está ordenada descendente.",
-      pista: "Para conservar el orden en la nueva lista, agregá atrás con un puntero al último.",
-      sol: `procedure sublista(L : lista; A, B : integer; var nueva : lista);
-var ult, nue : lista;
-begin
-  nueva := nil; ult := nil;
-  while (L <> nil) do begin
-    if (L^.num > A) and (L^.num < B) then begin
-      new(nue); nue^.num := L^.num; nue^.sig := nil;
-      if (nueva = nil) then nueva := nue else ult^.sig := nue;
-      ult := nue;
-    end;
-    L := L^.sig;
-  end;
-end;
-{ d) Ascendente: while (L <> nil) and (L^.num < B) do ...
-     (saltear los <= A y cortar al llegar a B)
-  e) Descendente: saltear los >= B y cortar cuando L^.num <= A. }`
-    },
-    {
-      ref: "P6 Ej 10",
-      titulo: "Lista de espera",
-      enunciado: "Cuando llega un cliente se registra su DNI y se le da el número siguiente. Se atiende por orden de llegada. Implementar RecibirCliente y AtenderCliente y simular la atención hasta el DNI 0.",
-      pista: "Es una cola: se agrega atrás (con puntero al último) y se atiende sacando el primero.",
-      sol: `type
-  cliente = record
-    dni : longint;
-    numero : integer;
-  end;
-  lista = ^nodo;
-  nodo = record
-    dato : cliente;
-    sig : lista;
-  end;
-
-procedure RecibirCliente(dni : longint; var pri, ult : lista;
-                         var ultNum : integer);
-var nue : lista;
-begin
-  ultNum := ultNum + 1;
-  new(nue);
-  nue^.dato.dni := dni;
-  nue^.dato.numero := ultNum;
-  nue^.sig := nil;
-  if (pri = nil) then pri := nue else ult^.sig := nue;
-  ult := nue;
-end;
-
-procedure AtenderCliente(var pri : lista; var c : cliente);
-var aux : lista;
-begin
-  c := pri^.dato;
-  aux := pri;
-  pri := pri^.sig;
-  dispose(aux);
-end;
-
-{ Programa: leer DNI hasta 0 llamando a RecibirCliente;
-  después, while (pri <> nil) do AtenderCliente(pri, c) e informar c. }`
-    }
-  ]
+  ejercicios: [...guiaP6a, ...guiaP6b],
 };
 
 export default tema;

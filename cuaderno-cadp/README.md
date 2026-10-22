@@ -4,7 +4,8 @@ Página de estudio para **Conceptos de Algoritmos, Datos y Programas** (Facultad
 
 - Teoría resumida de las 8 prácticas.
 - 55 preguntas de autoevaluación con explicación, más un quiz mezclado.
-- Ejercicios de las prácticas con pista y solución en Pascal.
+- La guía completa: los 137 ejercicios de las prácticas 1 a 7 (incluidos los adicionales), con pista y solución en Pascal. Cada solución es un programa completo, probado con Free Pascal, que se puede correr en el compilador.
+- 13 parciales resueltos (segundas fechas y redictados de 2018 a 2025) en `/parciales`, con la misma lógica de pista, solución y "Probar".
 - Simuladores paso a paso de vectores, punteros, listas y pruebas de escritorio.
 - Un compilador de Pascal en el navegador (`/compilador`), con entrada interactiva por consola y errores en español.
 
@@ -70,7 +71,9 @@ Detalles técnicos:
 src/
   data/
     types.ts           Tipos del contenido (Tema, Pregunta, Ejercicio…)
-    temas/*.ts         Un archivo por práctica: teoría, quiz y ejercicios
+    temas/*.ts         Un archivo por tema: teoría y quiz (los ejercicios vienen de guia/)
+    guia/*.ts          Los ejercicios de cada práctica, en orden, con pista, solución y datos de prueba
+                       (parciales1.ts y parciales2.ts tienen los parciales; se juntan en data/parciales.ts)
   components/          Layout, bloque de código, quiz, ejercicios, reproductor
   sims/                Simuladores: lógica pura (*Ops.ts, *Model.ts, traces.ts) y vistas (*.tsx)
   pages/               Inicio, página de tema y quiz mezclado
@@ -81,18 +84,20 @@ src/
 
 ## Agregar o corregir contenido
 
-Todo el contenido está en `src/data/temas/`. Por ejemplo, para sumar un ejercicio a Listas, editá `src/data/temas/listas.ts` y agregá un objeto al arreglo `ejercicios`:
+La teoría y el quiz están en `src/data/temas/`; los ejercicios, en `src/data/guia/` (un archivo por práctica). Por ejemplo, para corregir un ejercicio de Listas, editá `src/data/guia/p6b.ts`. Cada ejercicio es un objeto así:
 
 ```ts
 {
-  ref: "P6 Ej 11",
+  grupo: "Práctica 6 · Listas",   // título de sección en la pestaña
+  ref: "P6 Ej 11",                // identificador único: el progreso se guarda con esta clave
   titulo: "Premio Joaquín V. González",
   enunciado: "…",
   pista: "…",
   sol: `program premio;
 begin
   ...
-end.`
+end.`,
+  entrada: "1001\nPerez\n8.5\n0",   // opcional: datos para probar el programa
 }
 ```
 
@@ -108,6 +113,7 @@ TypeScript te avisa si falta algún campo. Los textos de teoría y de las pregun
 | `/:tema` | Teoría del tema (por ejemplo `/vectores`) |
 | `/:tema/quiz` | Quiz del tema |
 | `/:tema/ejercicios` | Ejercicios del tema |
+| `/parciales` | Parciales resueltos |
 | `/:tema/simulador` | Simulador (en los temas que lo tienen) |
 
 Temas: `control`, `modulos`, `parametros`, `registros`, `vectores`, `punteros`, `listas`, `repaso`.

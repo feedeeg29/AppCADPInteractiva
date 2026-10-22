@@ -17,6 +17,7 @@ begin
 end.`;
 
 const SIMS = [
+  { to: "/parciales", t: "Parciales resueltos", d: "Segundas fechas y redictados de 2018 a 2025, con pista y solución para correr." },
   { to: "/compilador", t: "Compilador Pascal", d: "Escribí y ejecutá tus programas, con entrada por consola y errores en español." },
   { to: "/vectores/simulador", t: "Vectores", d: "Insertar, eliminar y buscar con corrimientos paso a paso." },
   { to: "/punteros/simulador", t: "Punteros", d: "new, dispose, nil y los errores clásicos de memoria." },
@@ -53,7 +54,7 @@ export function Home() {
               <Link className="btn pri lg" to="/control">Empezar por la Práctica 1</Link>
             )}
             <Link className="btn lg" to="/compilador">Abrir el compilador</Link>
-            <Link className="btn lg ghost" to="/mezcla">Quiz mezclado</Link>
+            <Link className="btn lg ghost" to="/parciales">Parciales resueltos</Link>
           </div>
           <dl className="kpis">
             <div><dt>Prácticas</dt><dd>{TEMAS.length}</dd></div>
@@ -92,7 +93,7 @@ export function Home() {
           <Link key={s.to} to={s.to} className="card sim-card">
             <h3>{s.t}</h3>
             <p>{s.d}</p>
-            <span className="go">{s.to === "/compilador" ? "Abrir compilador →" : "Abrir simulador →"}</span>
+            <span className="go">{s.to === "/compilador" ? "Abrir compilador →" : s.to === "/parciales" ? "Ver parciales →" : "Abrir simulador →"}</span>
           </Link>
         ))}
       </div>

@@ -84,6 +84,10 @@ function Sidebar({ abierto, actual }: { abierto: boolean; actual?: string }) {
           </Link>
         );
       })}
+      <div className="lbl">Para el parcial</div>
+      <Link to="/parciales" className={"nav" + (actual === "parciales" ? " cur" : "")} aria-current={actual === "parciales" ? "page" : undefined}>
+        <span className="n">✎</span><span className="t">Parciales resueltos</span>
+      </Link>
       <div className="lbl">Herramientas</div>
       <Link to="/compilador" className={"nav" + (actual === "compilador" ? " cur" : "")} aria-current={actual === "compilador" ? "page" : undefined}>
         <span className="n">▶</span><span className="t">Compilador</span>

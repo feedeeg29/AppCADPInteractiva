@@ -1,4 +1,5 @@
 import type { Tema } from "../types";
+import { guiaP21 } from "../guia/p21";
 
 const tema: Tema = {
   id: "modulos",
@@ -159,63 +160,7 @@ end.`,
       exp: "Ningún if asigna el nombre de la función. Se arregla agregando un else final que asigne un valor."
     }
   ],
-  ejercicios: [
-    {
-      ref: "P2·1 Ej 4",
-      titulo: "alcance4a vs alcance4b",
-      enunciado: "En 4a las variables a y b se declaran antes del procedimiento uno; en 4b se declaran después. Explicar la diferencia.",
-      pista: "¿Qué variables ve uno en cada caso?",
-      sol: `{ 4a: a y b son globales y uno las ve.
-       uno asigna a := 1 sobre la global.
-       Imprime: 1 y luego 21. }
-
-{ 4b: uno se declara antes que a y b,
-       así que dentro de uno 'a' no existe.
-       Error de compilación: identificador no declarado. }`
-    },
-    {
-      ref: "P2·1 Ej 6",
-      titulo: "El par más alto",
-      enunciado: "(a) Módulo que lea enteros hasta un negativo e imprima el número par más alto. (b) Programa que lo invoque.",
-      pista: "Un procedimiento sin parámetros alcanza, porque lee e imprime solo. Inicializá el máximo en un valor que ningún dato válido pueda tener.",
-      sol: `program parMasAlto;
-procedure procesar;
-var
-  num, max : integer;
-begin
-  max := -1;
-  read(num);
-  while (num >= 0) do begin
-    if (num mod 2 = 0) and (num > max) then
-      max := num;
-    read(num);
-  end;
-  if (max = -1) then
-    writeln('No se leyeron pares')
-  else
-    writeln('El par más alto es ', max);
-end;
-begin
-  procesar;
-end.`
-    },
-    {
-      ref: "P2·1 Ej 7",
-      titulo: "calcularPromedio",
-      enunciado: "Corregir la función calcularPromedio (globales suma y cant), invocarla una sola vez y decir qué imprime con suma = 48 y cant = 6 en cada versión.",
-      pista: "Falta asignar el nombre de la función. Para invocarla una sola vez, guardá el resultado en una variable. En el original, además, se hace cant := 0 antes de la segunda llamada.",
-      sol: `{ a) Agregar al final de la función:
-       calcularPromedio := prom;
-  b) var p : real;
-     p := calcularPromedio;
-     if (p <> -1) then writeln('El promedio es: ', p)
-     else writeln('Dividir por cero no parece ser una buena idea');
-  c) i)   Original: el resultado es indefinido (la función no asigna su nombre).
-     ii)  Con (a): la primera llamada da 8, pero antes de la segunda
-          se pone cant := 0, así que imprime -1.
-     iii) Con (a) y (b): imprime 8. }`
-    }
-  ]
+  ejercicios: guiaP21,
 };
 
 export default tema;

@@ -44,6 +44,7 @@ class Parser {
   routine: Routine;
   loopDepth = 0;
   pendingPtrs: { t: Extract<PType, { k: "pointer" }>; tok: Token }[] = [];
+  programName = "";
 
   constructor(private src: string) {
     this.toks = tokenize(src);
@@ -76,7 +77,8 @@ class Parser {
   srcOf(fromTok: Token) { return this.src.slice(fromTok.pos, this.prev.end); }
 
   declare(sym: Sym, tok: Token) {
-    if (this.scope.syms.has(sym.name)) this.err(`'${tok.raw}' ya está declarado en este bloque.`, tok);
+    if (this.scope.syms.has(sym.name)) this.err(`'${tok.raw}' ya está declarado en este bloque. Ojo: Pascal no distingue mayúsculas de minúsculas.`, tok);
+    if (this.scope.level === 0 && sym.name === this.programName) this.err(`'${tok.raw}' es el nombre del programa: usá otro nombre para no confundirlos.`, tok);
     this.scope.syms.set(sym.name, sym);
   }
   newSlot(type: PType, raw: string) {
@@ -88,7 +90,7 @@ class Parser {
   // ---------- programa y declaraciones ----------
   program(): Program {
     if (this.accept("program")) {
-      this.expectId("el nombre del programa");
+      this.programName = this.expectId("el nombre del programa").v;
       if (this.accept("(")) { while (!this.accept(")")) this.next(); }
       this.expect(";");
     }

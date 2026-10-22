@@ -466,15 +466,45 @@ function fmtOrd(n: number, t: PType) {
   return String(n);
 }
 
+/**
+ * x con d decimales, redondeando como Free Pascal: primero lleva el número a
+ * 15 cifras significativas y después redondea "hacia arriba" el 5
+ * (así 2.675:0:2 da 2.68, igual que en Free Pascal).
+ */
+function fixedFPC(x: number, d: number): string {
+  if (!isFinite(x)) return String(x);
+  const neg = x < 0;
+  const [mant, expStr] = Math.abs(x).toPrecision(15).split("e");
+  let digits = mant.replace(".", "");
+  let point = (mant.indexOf(".") === -1 ? mant.length : mant.indexOf(".")) + (expStr ? Number(expStr) : 0);
+  // normalizar: dígitos con el punto en la posición 'point'
+  if (point < 0) { digits = "0".repeat(-point) + digits; point = 0; }
+  if (digits.length < point + d + 1) digits = digits.padEnd(point + d + 1, "0");
+  let keep = digits.slice(0, point + d).split("").map(Number);
+  if (Number(digits[point + d]) >= 5) {
+    let i = keep.length - 1;
+    while (i >= 0) {
+      if (keep[i] < 9) { keep[i]++; break; }
+      keep[i] = 0;
+      i--;
+    }
+    if (i < 0) { keep = [1, ...keep]; point++; }
+  }
+  let ent = keep.slice(0, point).join("").replace(/^0+(?=\d)/, "") || "0";
+  const dec = keep.slice(point).join("");
+  const out = d > 0 ? ent + "." + dec : ent;
+  return neg ? "-" + out : out;
+}
+
 /** Formato de write/writeln como Free Pascal. */
 export function fmt(v: unknown, t: PType, width?: number, dec?: number): string {
   const b = base(t);
   let s: string;
   if (b.k === "real") {
     const x = v as number;
-    if (dec !== undefined) s = x.toFixed(Math.max(0, dec));
+    if (dec !== undefined) s = fixedFPC(x, Math.max(0, dec));
     else {
-      const digits = width !== undefined ? Math.max(1, width - 7) : 16;
+      const digits = width !== undefined ? Math.max(1, width - 8) : 16;
       const [m, ex] = Math.abs(x).toExponential(Math.min(digits, 20)).split("e");
       const en = Number(ex);
       s = (x < 0 ? "-" : " ") + m + "E" + (en < 0 ? "-" : "+") + String(Math.abs(en)).padStart(3, "0");

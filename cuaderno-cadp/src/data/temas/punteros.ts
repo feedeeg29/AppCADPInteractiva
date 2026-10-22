@@ -1,4 +1,5 @@
 import type { Tema } from "../types";
+import { guiaP5 } from "../guia/p5";
 
 const tema: Tema = {
   id: "punteros",
@@ -133,75 +134,7 @@ writeln(pc^);`,
       exp: "Son 2500 punteros de 4 bytes. Los strings recién ocuparán memoria dinámica cuando hagas new de cada uno."
     }
   ],
-  ejercicios: [
-    {
-      ref: "P5 Ej 1",
-      titulo: "sizeof con punteros a cadena",
-      enunciado: "Indicar qué imprime el programa: sizeof(pc) antes y después de new, sizeof(pc) y sizeof(pc^) después de asignar textos de distinto largo.",
-      pista: "sizeof nunca depende del contenido.",
-      sol: `4 bytes      { sizeof(pc) antes de new }
-4 bytes      { después de new }
-4 bytes      { después de asignar }
-51 bytes     { sizeof(pc^): string[50] = 51 }
-51 bytes     { con otro texto: sigue siendo 51 }`
-    },
-    {
-      ref: "P5 Ej 2",
-      titulo: "sizeof con registros",
-      enunciado: "producto = record codigo : integer; descripcion : string[9]; precio : real; end. Indicar qué imprime cada sizeof.",
-      pista: "Calculá primero el tamaño del registro: es la suma de los campos.",
-      sol: `4 bytes      { sizeof(p) }
-16 bytes     { sizeof(prod) = 2 + 10 + 4 }
-4 bytes      { sizeof(p) después de new }
-16 bytes     { sizeof(p^) }
-16 bytes     { sizeof(p^) }
-16 bytes     { sizeof(prod) }`
-    },
-    {
-      ref: "P5 Ej 4",
-      titulo: "¿Qué imprimen a, b, c y d?",
-      enunciado: "Cuatro programas con punteros a cadena: (a) asigna pc^ antes de new; (b) usa pc^ después de dispose; (c) cambia pun^ en un procedimiento; (d) hace new(pun) dentro del procedimiento.",
-      pista: "Pensá en qué dirección guarda el puntero en cada momento.",
-      sol: `{ a) Error: pc^ se usa antes de new. pc no apunta a memoria válida.
-  b) Imprime '51 bytes' y 'un nuevo nombre'. La última asignación
-     ocurre después de dispose: es un error (memoria ya liberada).
-  c) Imprime 'Un texto' y 'Otro texto'.
-     pun es una copia de pc pero apunta al mismo lugar.
-  d) Imprime 'Un texto' dos veces. new(pun) cambia solo la copia;
-     esa memoria nueva queda perdida al salir del procedimiento. }`
-    },
-    {
-      ref: "P5 Ej 5",
-      titulo: "Memoria disponible en I a V",
-      enunciado: "TEmpleado = record sucursal : char; apellido : string[25]; correo : string[40]; sueldo : real; end. Con 400.000 bytes libres en (I), calcular la memoria disponible en cada punto.",
-      pista: "Solo new y dispose cambian la memoria dinámica disponible.",
-      sol: `{ sizeof(TEmpleado) = 1 + 26 + 41 + 4 = 72 bytes
-  (I)   400.000
-  (II)  400.000   leer en una variable estática no cambia nada
-  (III) 399.928   new reserva 72 bytes
-  (IV)  399.928   escribir en p^ no pide más memoria
-  (V)   400.000   dispose devuelve los 72 bytes }`
-    },
-    {
-      ref: "P5 Ej 7",
-      titulo: "Vector de punteros a nombres",
-      enunciado: "2500 nombres de hasta 50 caracteres. (a) Tamaño de un vector estático. (b) Con un vector de punteros: tamaño inicial, módulo que reserve memoria para los 2500 y módulo que los lea.",
-      pista: "string[50] ocupa 51. Cada puntero, 4.",
-      sol: `{ a) array[1..2500] of string[50] = 2500 * 51 = 127.500 bytes (supera 64 KB)
-  b) i) 2500 * 4 = 10.000 bytes de memoria estática. }
-procedure reservar(var p : ArrPunteros);
-var i : integer;
-begin
-  for i := 1 to 2500 do new(p[i]);
-end;
-{ ii) Se reservan 2500 * 51 = 127.500 bytes de memoria dinámica. }
-procedure leerNombres(var p : ArrPunteros);
-var i : integer;
-begin
-  for i := 1 to 2500 do readln(p[i]^);
-end;`
-    }
-  ]
+  ejercicios: guiaP5,
 };
 
 export default tema;

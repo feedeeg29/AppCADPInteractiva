@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PascalEditor, type EditorHandle } from "../components/PascalEditor";
+import { PARCIALES } from "../data/parciales";
 import { TEMAS } from "../data/temas";
 import { usePascalRunner } from "../pascal/usePascalRunner";
 
@@ -67,8 +68,11 @@ function ejemplos(): Ejemplo[] {
   ];
   for (const t of TEMAS)
     t.ejercicios.forEach((e, i) => {
-      if (/^\s*program\b/i.test(e.sol)) base.push({ id: `${t.id}-${i}`, grupo: `${t.num} · ${t.titulo}`, nombre: `${e.ref} · ${e.titulo}`, code: e.sol });
+      if (/^\s*(\{[^}]*\}\s*)*program\b/i.test(e.sol)) base.push({ id: `${t.id}-${i}`, grupo: `${t.num} · ${t.titulo}`, nombre: `${e.ref} · ${e.titulo}`, code: e.sol });
     });
+  PARCIALES.forEach((e, i) => {
+    if (/^\s*(\{[^}]*\}\s*)*program\b/i.test(e.sol)) base.push({ id: `parcial-${i}`, grupo: e.grupo ?? "Parciales", nombre: `${e.ref} · ${e.titulo}`, code: e.sol });
+  });
   return base;
 }
 
@@ -201,6 +205,7 @@ export function CompilerPage() {
           <li>Es más estricto que Free Pascal para ayudarte a encontrar errores: avisa si usás una variable sin inicializar, si un índice se sale del arreglo o si accedés a un puntero en nil o ya liberado.</li>
           <li><code>integer</code> ocupa 2 bytes (de −32768 a 32767), como en la tabla de la cátedra. Si un valor no entra, se guarda dando la vuelta, igual que en Free Pascal, y la consola te avisa.</li>
           <li><code>sizeof</code> usa la tabla de la Práctica 5 (por ejemplo real = 4 bytes).</li>
+          <li>Los reales se escriben con el mismo redondeo que Free Pascal (por ejemplo <code>2.675:0:2</code> da 2.68). En casos límite el último decimal de una cuenta puede diferir, porque Free Pascal hace algunas operaciones intermedias con más precisión.</li>
           <li>Si un programa no termina, se corta solo a los 20 millones de pasos. También podés tocar Detener.</li>
         </ul>
       </details>

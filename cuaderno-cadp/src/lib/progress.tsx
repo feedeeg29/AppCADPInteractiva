@@ -33,7 +33,7 @@ interface ProgressValue {
   de: (id: string) => ProgresoTema;
   toggleTeoria: (id: string) => void;
   registrarQuiz: (id: string, correctas: number) => void;
-  toggleEjercicio: (id: string, i: number) => void;
+  toggleEjercicio: (id: string, ref: string) => void;
   registrarMix: (correctas: number) => void;
   visitar: (id: string) => void;
   reiniciar: () => void;
@@ -70,11 +70,11 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     de,
     toggleTeoria: (id) => update(id, (t) => ({ ...t, teoria: !t.teoria })),
     registrarQuiz: (id, n) => update(id, (t) => ({ ...t, tries: t.tries + 1, best: Math.max(t.best, n) })),
-    toggleEjercicio: (id, i) =>
+    toggleEjercicio: (id, ref) =>
       update(id, (t) => {
         const ej = { ...t.ej };
-        if (ej[i]) delete ej[i];
-        else ej[i] = true;
+        if (ej[ref]) delete ej[ref];
+        else ej[ref] = true;
         return { ...t, ej };
       }),
     registrarMix: (n) => setProgreso((p) => ({ ...p, mix: Math.max(p.mix, n) })),
@@ -92,7 +92,7 @@ export function useProgress() {
 }
 
 export function ejerciciosHechos(t: Tema, p: ProgresoTema) {
-  return t.ejercicios.filter((_, i) => p.ej[i]).length;
+  return t.ejercicios.filter((e) => p.ej[e.ref]).length;
 }
 
 /** Porcentaje del tema: teoría, quiz y ejercicios pesan lo mismo. */

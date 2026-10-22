@@ -17,7 +17,7 @@ interface Props {
 
 export function CodeBlock({ code, title = "pascal", numbers = false, active = 0, copy = true, probar = true }: Props) {
   const { navigate } = useRouter();
-  const esPrograma = probar && /^\s*program\b/i.test(code);
+  const esPrograma = probar && /^\s*(\{[^}]*\}\s*)*program\b/i.test(code);
   const lines = useMemo(() => highlightLines(code), [code]);
   const preRef = useRef<HTMLPreElement>(null);
   const [copiado, setCopiado] = useState(false);
